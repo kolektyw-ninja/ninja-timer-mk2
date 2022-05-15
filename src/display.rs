@@ -1,6 +1,6 @@
 extern crate sdl2;
 
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use std::path::Path;
 use std::sync::mpsc::{self, TryRecvError};
 
@@ -16,6 +16,8 @@ pub struct Display {
     receiver: mpsc::Receiver<String>,
     text: String,
 }
+
+const TARGET_FRAME_DURATION: Duration = Duration::from_millis(1000 / 30);
 
 impl Display {
     pub fn new(receiver: mpsc::Receiver<String>) -> Self {
@@ -45,7 +47,11 @@ impl Display {
         canvas.present();
         let mut event_pump = sdl_context.event_pump()?;
 
+        let mut frame_duration = Duration::ZERO;
+
         'running: loop {
+            let frame_start = Instant::now();
+
             for event in event_pump.poll_iter() {
                 match event {
                     Event::Quit { .. }
@@ -59,9 +65,12 @@ impl Display {
 
             canvas.clear();
             render_text(&self.text, &Point::new(400, 300), &font, &mut canvas)?;
+            render_text(&format!("{}", frame_duration.as_millis()), &Point::new(400, 500), &font, &mut canvas)?;
             canvas.present();
-            ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 30));
+
             self.handle_messages()?;
+            frame_duration = frame_start.elapsed();
+            ::std::thread::sleep(TARGET_FRAME_DURATION - frame_duration);
         }
 
         Ok(())
