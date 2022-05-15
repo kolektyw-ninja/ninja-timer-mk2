@@ -5,6 +5,7 @@ use std::path::Path;
 use std::sync::mpsc::{self, TryRecvError};
 
 use sdl2::ttf::{self, Font};
+use sdl2::image::{self, InitFlag, LoadTexture};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -30,8 +31,11 @@ impl Display {
     pub fn show_windows(&mut self) -> Result<(), String> {
         let sdl_context = sdl2::init()?;
         let ttf_context = ttf::init().map_err(|e| e.to_string())?;
-        let video_subsystem = sdl_context.video()?;
+        let _image_context = image::init(InitFlag::PNG)?;
+
         let font = ttf_context.load_font(Path::new("./static/Inconsolata-Medium.ttf"), 64)?;
+
+        let video_subsystem = sdl_context.video()?;
 
         let window = video_subsystem
             .window("ninja-timer", 800, 600)
@@ -41,9 +45,10 @@ impl Display {
             .map_err(|e| e.to_string())?;
 
         let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
+        let texture_creator = canvas.texture_creator();
+        let background = texture_creator.load_texture(Path::new("./static/bg.png"))?;
 
-        canvas.set_draw_color(Color::RGB(0, 0, 0));
-        canvas.clear();
+        canvas.copy(&background, None, None)?;
         canvas.present();
         let mut event_pump = sdl_context.event_pump()?;
 
@@ -63,7 +68,7 @@ impl Display {
                 }
             }
 
-            canvas.clear();
+            canvas.copy(&background, None, None)?;
             render_text(&self.text, &Point::new(400, 300), &font, &mut canvas)?;
             render_text(&format!("{}", frame_duration.as_millis()), &Point::new(400, 500), &font, &mut canvas)?;
             canvas.present();
