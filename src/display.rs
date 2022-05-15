@@ -13,18 +13,23 @@ use sdl2::rect::{Rect, Point};
 use sdl2::render::{Canvas, TextureQuery};
 use sdl2::video::Window;
 
+use crate::state::OutputEvent;
+use crate::timer::Timer;
+
 pub struct Display {
-    receiver: mpsc::Receiver<String>,
+    receiver: mpsc::Receiver<OutputEvent>,
     text: String,
+    timers: Vec<Timer>,
 }
 
 const TARGET_FRAME_DURATION: Duration = Duration::from_millis(1000 / 30);
 
 impl Display {
-    pub fn new(receiver: mpsc::Receiver<String>) -> Self {
+    pub fn new(receiver: mpsc::Receiver<OutputEvent>) -> Self {
         Self {
             receiver,
             text: String::from("hello world"),
+            timers: vec![Timer::new(0)],
         }
     }
 
@@ -36,6 +41,11 @@ impl Display {
         let font = ttf_context.load_font(Path::new("./static/Inconsolata-Medium.ttf"), 64)?;
 
         let video_subsystem = sdl_context.video()?;
+        let displays = video_subsystem.num_video_displays()?;
+        for i in 0..displays {
+            let bounds = video_subsystem.display_bounds(i)?;
+            println!("Display {}: {:?}", i, bounds);
+        }
 
         let window = video_subsystem
             .window("ninja-timer", 800, 600)
@@ -69,7 +79,7 @@ impl Display {
             }
 
             canvas.copy(&background, None, None)?;
-            render_text(&self.text, &Point::new(400, 300), &font, &mut canvas)?;
+            render_text(&self.timers[0].format(), &Point::new(400, 300), &font, &mut canvas)?;
             render_text(&format!("{}", frame_duration.as_millis()), &Point::new(400, 500), &font, &mut canvas)?;
             canvas.present();
 
@@ -84,7 +94,12 @@ impl Display {
     fn handle_messages(&mut self) -> Result<(), String> {
         loop {
             match self.receiver.try_recv() {
-                Ok(text) => self.text = text,
+                Ok(event) => match event {
+                    OutputEvent::SyncTimers(timers) => {
+                        self.timers = timers;
+                    },
+                    _ => (),
+                },
                 Err(TryRecvError::Empty) => break,
                 Err(TryRecvError::Disconnected) => return Err(String::from("Receiver disconnected")),
             }
@@ -111,3 +126,4 @@ fn render_text(text: &str, point: &Point, font: &Font, canvas: &mut Canvas<Windo
 
     canvas.copy(&texture, None, rect)
 }
+
