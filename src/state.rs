@@ -39,9 +39,7 @@ impl StateManager {
                     Some(timer) => {
                         timer.start();
 
-                        for listener in &self.listeners {
-                            listener.send(OutputEvent::SyncTimers(self.timers.clone())).map_err(|e| e.to_string())?;
-                        }
+                        self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                     },
                     None => return Err(format!("Timer index {} is out of bounds", i)),
                 }
