@@ -85,7 +85,9 @@ impl Display {
 
             self.handle_messages()?;
             frame_duration = frame_start.elapsed();
-            ::std::thread::sleep(TARGET_FRAME_DURATION - frame_duration);
+            if frame_duration < TARGET_FRAME_DURATION {
+                ::std::thread::sleep(TARGET_FRAME_DURATION - frame_duration);
+            }
         }
 
         Ok(())
