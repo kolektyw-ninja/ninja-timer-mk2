@@ -51,16 +51,15 @@ impl StateManager {
     }
 
     fn notify_listeners(&mut self, event: &OutputEvent) -> Result<(), String> {
-        let errors: Vec<_> = self.listeners
+        let mut errors = self.listeners
             .iter()
             .map(|listener| listener.send(event.clone()))
-            .filter(Result::is_err)
-            .collect();
+            .filter(Result::is_err);
 
-        if errors.is_empty() {
-            Ok(())
-        } else {
+        if errors.next().is_some() {
             Err(String::from("One or more listeners failed"))
+        } else {
+            Ok(())
         }
     }
 }
