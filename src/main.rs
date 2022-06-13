@@ -3,6 +3,7 @@ extern crate sdl2;
 mod display;
 mod timer;
 mod state;
+mod assets;
 
 use std::thread;
 use std::sync::mpsc;

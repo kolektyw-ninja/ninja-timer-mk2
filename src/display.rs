@@ -1,5 +1,3 @@
-extern crate sdl2;
-
 use std::time::{Duration, Instant};
 use std::path::Path;
 use std::sync::mpsc::{self, TryRecvError};
@@ -12,9 +10,11 @@ use sdl2::pixels::Color;
 use sdl2::rect::{Rect, Point};
 use sdl2::render::{Canvas, TextureQuery};
 use sdl2::video::Window;
+use sdl2::rwops::RWops;
 
 use crate::state::OutputEvent;
 use crate::timer::Timer;
+use crate::assets;
 
 pub struct Display {
     receiver: mpsc::Receiver<OutputEvent>,
@@ -38,7 +38,7 @@ impl Display {
         let ttf_context = ttf::init().map_err(|e| e.to_string())?;
         let _image_context = image::init(InitFlag::PNG)?;
 
-        let font = ttf_context.load_font(Path::new("./static/Inconsolata-Medium.ttf"), 64)?;
+        let font = ttf_context.load_font_from_rwops(RWops::from_bytes(assets::FONT).unwrap(), 64)?;
 
         let video_subsystem = sdl_context.video()?;
         let displays = video_subsystem.num_video_displays()?;
@@ -56,7 +56,7 @@ impl Display {
 
         let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
         let texture_creator = canvas.texture_creator();
-        let background = texture_creator.load_texture(Path::new("./static/bg.png"))?;
+        let background = texture_creator.load_texture_bytes(assets::BACKGROUND)?;
 
         canvas.copy(&background, None, None)?;
         canvas.present();
