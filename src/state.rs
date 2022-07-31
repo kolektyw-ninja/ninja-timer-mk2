@@ -35,19 +35,29 @@ impl StateManager {
     pub fn process(&mut self, event: InputEvent) -> Result<(), String> {
         match event {
             InputEvent::StartTimer(i) => {
-                match self.timers.get_mut(i) {
-                    Some(timer) => {
-                        timer.start();
+                self.get_timer_mut(i)?.start();
+                self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
 
-                        self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
-                    },
-                    None => return Err(format!("Timer index {} is out of bounds", i)),
-                }
+            },
+            InputEvent::StopTimer(i) => {
+                self.get_timer_mut(i)?.stop();
+                self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+            },
+            InputEvent::ResetTimer(i) => {
+                self.get_timer_mut(i)?.reset();
+                self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
             },
             _ => return Err(format!("Couldn't process: {:?}", event)),
         }
 
         Ok(())
+    }
+
+    fn get_timer_mut(&mut self, id: usize) -> Result<&mut Timer, String> {
+        match self.timers.get_mut(id) {
+            Some(timer) => Ok(timer),
+            None => Err(format!("Timer index {} is out of bounds", id)),
+        }
     }
 
     fn notify_listeners(&mut self, event: &OutputEvent) -> Result<(), String> {
