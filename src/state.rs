@@ -35,13 +35,18 @@ impl StateManager {
     pub fn process(&mut self, event: InputEvent) -> Result<(), String> {
         match event {
             InputEvent::StartTimer(i) => {
-                self.get_timer_mut(i)?.start();
-                self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
-
+                if let Err(msg) = self.get_timer_mut(i)?.start() {
+                    eprintln!("Timer {} couldn't be started: {}", i, msg);
+                } else {
+                    self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+                }
             },
             InputEvent::StopTimer(i) => {
-                self.get_timer_mut(i)?.stop();
-                self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+                if let Err(msg) = self.get_timer_mut(i)?.stop() {
+                    eprintln!("Timer {} couldn't be stopped: {}", i, msg);
+                } else {
+                    self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+                }
             },
             InputEvent::ResetTimer(i) => {
                 self.get_timer_mut(i)?.reset();

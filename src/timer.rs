@@ -7,6 +7,7 @@ pub struct Timer {
     countdown_duration: Duration,
 }
 
+#[derive(Eq, PartialEq)]
 pub enum TimerState {
     Reset,
     CountingDown,
@@ -23,12 +24,22 @@ impl Timer {
         }
     }
 
-    pub fn start(&mut self) {
-        self.started_at = Some(Instant::now());
+    pub fn start(&mut self) -> Result<(), String> {
+        if self.get_state() == TimerState::Reset {
+            self.started_at = Some(Instant::now());
+            Ok(())
+        } else {
+            Err(format!("Timer hasn't been reset"))
+        }
     }
 
-    pub fn stop(&mut self) {
-        self.stopped_at = Some(Instant::now());
+    pub fn stop(&mut self) -> Result<(), String> {
+        if self.get_state() == TimerState::Running {
+            self.stopped_at = Some(Instant::now());
+            Ok(())
+        } else {
+            Err(format!("Timer isn't running"))
+        }
     }
 
     pub fn as_millis(&self) -> i128 {
