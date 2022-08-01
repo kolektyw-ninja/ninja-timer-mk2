@@ -56,6 +56,7 @@ impl StateManager {
             InputEvent::RequestSync => {
                 self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
             },
+            #[allow(unreachable_patterns)]
             _ => return Err(format!("Couldn't process: {:?}", event)),
         }
 

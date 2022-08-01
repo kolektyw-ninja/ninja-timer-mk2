@@ -7,11 +7,9 @@ mod broadcast;
 
 use std::thread;
 use std::sync::mpsc;
-use std::time::Duration;
 
 use display::Display;
-use timer::Timer;
-use state::{StateManager, OutputEvent, InputEvent};
+use state::{StateManager};
 use web::spawn_server;
 
 

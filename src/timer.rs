@@ -29,7 +29,7 @@ impl Timer {
             self.started_at = Some(Instant::now());
             Ok(())
         } else {
-            Err(format!("Timer hasn't been reset"))
+            Err("Timer hasn't been reset".to_string())
         }
     }
 
@@ -38,7 +38,7 @@ impl Timer {
             self.stopped_at = Some(Instant::now());
             Ok(())
         } else {
-            Err(format!("Timer isn't running"))
+            Err("Timer isn't running".to_string())
         }
     }
 
@@ -57,7 +57,7 @@ impl Timer {
     pub fn get_state(&self) -> TimerState {
         match self.started_at {
             None => TimerState::Reset,
-            Some(start) => {
+            Some(_) => {
                 if self.as_millis() < 0 {
                     TimerState::CountingDown
                 } else {

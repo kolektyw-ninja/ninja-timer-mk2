@@ -1,5 +1,4 @@
 use std::time::{Duration, Instant};
-use std::path::Path;
 use std::sync::mpsc::{self, TryRecvError};
 
 use sdl2::ttf::{self, Font};
@@ -19,7 +18,6 @@ use crate::assets;
 
 pub struct Display {
     receiver: mpsc::Receiver<OutputEvent>,
-    text: String,
     timers: Vec<Timer>,
 }
 
@@ -29,7 +27,6 @@ impl Display {
     pub fn new(receiver: mpsc::Receiver<OutputEvent>) -> Self {
         Self {
             receiver,
-            text: String::from("hello world"),
             timers: vec![Timer::new(0)],
         }
     }
@@ -139,10 +136,12 @@ impl Display {
     fn handle_messages(&mut self) -> Result<(), String> {
         loop {
             match self.receiver.try_recv() {
+                #[allow(clippy::single_match)]
                 Ok(event) => match event {
                     OutputEvent::SyncTimers(timers) => {
                         self.timers = timers;
                     },
+                    #[allow(unreachable_patterns)]
                     _ => (),
                 },
                 Err(TryRecvError::Empty) => break,
@@ -165,10 +164,6 @@ impl<'a> Clip<'a> {
             music,
             stop_at: None,
         }
-    }
-
-    pub fn play(&self) -> Result<(), String> {
-        self.music.play(1)
     }
 
     pub fn play_duration(&mut self, duration: Duration) -> Result<(), String> {
