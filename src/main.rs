@@ -17,7 +17,8 @@ use web::spawn_server;
 
 pub fn main() -> Result<(), String> {
     let (input_tx, input_rx) = mpsc::channel();
-    let _server_handle = spawn_server(input_tx);
+    let (output_tx, output_rx) = mpsc::channel();
+    let _server_handle = spawn_server(input_tx, output_rx);
 
     let (display_tx, display_rx) = mpsc::channel();
     let mut display = Display::new(display_rx);
@@ -27,6 +28,7 @@ pub fn main() -> Result<(), String> {
 
     let mut state_manager = StateManager::new();
     state_manager.add_listener(display_tx);
+    state_manager.add_listener(output_tx);
 
     for event in input_rx {
         state_manager.process(event).unwrap();

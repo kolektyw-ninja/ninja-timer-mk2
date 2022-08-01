@@ -13,7 +13,7 @@ use actix_web::{
     Responder,
 };
 
-use crate::state::InputEvent;
+use crate::state::{InputEvent, OutputEvent};
 use crate::broadcast::Broadcaster;
 
 struct AppState {
@@ -44,6 +44,12 @@ async fn reset_timer(data: web::Data<AppState>) -> impl Responder {
     HttpResponse::Ok().body("OK")
 }
 
+#[post("/api/request_sync")]
+async fn request_sync(data: web::Data<AppState>) -> impl Responder {
+    data.send(InputEvent::RequestSync);
+    HttpResponse::Ok().body("OK")
+}
+
 #[get("/api/events")]
 async fn events(broadcaster: web::Data<Broadcaster>) -> impl Responder {
     let client = broadcaster.new_client();
@@ -53,12 +59,19 @@ async fn events(broadcaster: web::Data<Broadcaster>) -> impl Responder {
         .streaming(client)
 }
 
-async fn init_server(sender: mpsc::Sender<InputEvent>) -> std::io::Result<()> {
+async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<OutputEvent>) -> std::io::Result<()> {
     let state = web::Data::new(AppState {
         sender: Mutex::new(sender),
     });
 
     let broadcaster = Broadcaster::create();
+    let clone = broadcaster.clone();
+
+    spawn(move || {
+        for event in receiver {
+            clone.send(&format!("{:?}", event));
+        }
+    });
 
     let _ = HttpServer::new(move || {
         App::new()
@@ -67,6 +80,7 @@ async fn init_server(sender: mpsc::Sender<InputEvent>) -> std::io::Result<()> {
             .service(start_timer)
             .service(stop_timer)
             .service(reset_timer)
+            .service(request_sync)
             .service(events)
     })
     .bind(("0.0.0.0", 8080))?
@@ -76,8 +90,8 @@ async fn init_server(sender: mpsc::Sender<InputEvent>) -> std::io::Result<()> {
     Ok(())
 }
 
-pub fn spawn_server(sender: mpsc::Sender<InputEvent>) -> JoinHandle<()> {
+pub fn spawn_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<OutputEvent>) -> JoinHandle<()> {
     spawn(|| {
-        rt::System::new().block_on(init_server(sender)).unwrap();
+        rt::System::new().block_on(init_server(sender, receiver)).unwrap();
     })
 }

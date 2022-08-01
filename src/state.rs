@@ -7,6 +7,7 @@ pub enum InputEvent {
     StartTimer(usize),
     StopTimer(usize),
     ResetTimer(usize),
+    RequestSync,
 }
 
 #[derive(Debug, Clone)]
@@ -50,6 +51,9 @@ impl StateManager {
             },
             InputEvent::ResetTimer(i) => {
                 self.get_timer_mut(i)?.reset();
+                self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+            },
+            InputEvent::RequestSync => {
                 self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
             },
             _ => return Err(format!("Couldn't process: {:?}", event)),
