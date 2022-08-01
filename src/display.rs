@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 use std::sync::mpsc::{self, TryRecvError};
 
-use sdl2::ttf::{self, Font};
+use sdl2::ttf::{self, Font, Sdl2TtfContext};
 use sdl2::image::{self, InitFlag, LoadTexture};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -45,26 +45,22 @@ impl Display {
         let beep2 = Music::from_static_bytes(assets::BEEP2)?;
         let mut buzzer = Clip::new(Music::from_static_bytes(assets::BUZZER)?);
 
-        let chunk_decoders_num = mixer::get_chunk_decoders_number();
-        for i in 0..chunk_decoders_num {
-            println!("{}", mixer::get_chunk_decoder(i));
-        }
-
-        let font = ttf_context.load_font_from_rwops(RWops::from_bytes(assets::FONT).unwrap(), 64)?;
-
         let video_subsystem = sdl_context.video()?;
         let displays = video_subsystem.num_video_displays()?;
-        for i in 0..displays {
-            let bounds = video_subsystem.display_bounds(i)?;
-            println!("Display {}: {:?}", i, bounds);
+        let display_bounds: Vec<_> = (0..displays).map(|i| { video_subsystem.display_bounds(i).unwrap()}).collect();
+
+        for (i, bounds) in display_bounds.iter().enumerate() {
+            eprintln!("Display {}: {:?}", i, bounds);
         }
 
         let window = video_subsystem
             .window("ninja-timer", 800, 600)
-            .position_centered()
+            .fullscreen_desktop()
             .opengl()
             .build()
             .map_err(|e| e.to_string())?;
+
+        let mut font = ResizeableFont::load_from_bytes(&ttf_context, assets::FONT, 64)?;
 
         let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
         let texture_creator = canvas.texture_creator();
@@ -97,11 +93,16 @@ impl Display {
             self.handle_messages()?;
 
             // Drawing
+            let viewport = canvas.viewport();
+            let width = viewport.width();
+            let height = viewport.height();
+
             let timer = self.timers[0];
+            font.set_size(height as u16 / 5);
 
             canvas.copy(&background, None, None)?;
-            render_text(&timer.format(), &Point::new(400, 300), &font, &mut canvas)?;
-            render_text(&format!("{}", frame_duration.as_millis()), &Point::new(400, 500), &font, &mut canvas)?;
+            render_text(&timer.format(), &Point::new(width as i32 / 2, height as i32 / 2), &font.inner, &mut canvas)?;
+            render_text(&format!("{}", frame_duration.as_millis()), &Point::new(400, 500), &font.inner, &mut canvas)?;
             canvas.present();
 
             // Audio
@@ -150,6 +151,33 @@ impl Display {
         }
 
         Ok(())
+    }
+}
+
+struct ResizeableFont<'ttf_module, 'rwops> {
+    ctx: &'ttf_module Sdl2TtfContext,
+    bytes: &'static [u8],
+    inner: Font<'ttf_module, 'rwops>,
+    size: u16,
+}
+
+impl<'a, 'b> ResizeableFont<'a, 'b> {
+    pub fn load_from_bytes(ctx: &'a Sdl2TtfContext, bytes: &'static [u8], size: u16) -> Result<Self, String> {
+        let font = Self {
+            ctx,
+            bytes,
+            inner: ctx.load_font_from_rwops(RWops::from_bytes(bytes)?, size)?,
+            size,
+        };
+
+        Ok(font)
+    }
+
+    pub fn set_size(&mut self, size: u16) {
+        if size != self.size {
+            self.inner = self.ctx.load_font_from_rwops(RWops::from_bytes(self.bytes).unwrap(), size).unwrap();
+            self.size = size;
+        }
     }
 }
 
