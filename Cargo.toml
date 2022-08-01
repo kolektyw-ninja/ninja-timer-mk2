@@ -7,6 +7,9 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4"
+futures-util = "*"
+parking_lot = "*"
+tokio = "*"
 
 [dependencies.sdl2]
 version = "0.35"

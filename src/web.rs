@@ -1,9 +1,20 @@
 use std::thread::{spawn, JoinHandle};
 use std::sync::{mpsc, Mutex};
 
-use actix_web::{rt, get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{
+    rt,
+    get,
+    post,
+    web,
+    http::header,
+    App,
+    HttpResponse,
+    HttpServer,
+    Responder,
+};
 
 use crate::state::InputEvent;
+use crate::broadcast::Broadcaster;
 
 struct AppState {
     sender: Mutex<mpsc::Sender<InputEvent>>,
@@ -33,27 +44,40 @@ async fn reset_timer(data: web::Data<AppState>) -> impl Responder {
     HttpResponse::Ok().body("OK")
 }
 
+#[get("/api/events")]
+async fn events(broadcaster: web::Data<Broadcaster>) -> impl Responder {
+    let client = broadcaster.new_client();
 
-pub fn run_server(sender: mpsc::Sender<InputEvent>) -> std::io::Result<()> {
+    HttpResponse::Ok()
+        .append_header((header::CONTENT_TYPE, "text/event-stream"))
+        .streaming(client)
+}
+
+async fn init_server(sender: mpsc::Sender<InputEvent>) -> std::io::Result<()> {
     let state = web::Data::new(AppState {
         sender: Mutex::new(sender),
     });
 
-    rt::System::new().block_on(
-        HttpServer::new(move || {
-            App::new()
-                .app_data(state.clone())
-                .service(start_timer)
-                .service(stop_timer)
-                .service(reset_timer)
-        })
-        .bind(("0.0.0.0", 8080))?
-        .run()
-    )
+    let broadcaster = Broadcaster::create();
+
+    let _ = HttpServer::new(move || {
+        App::new()
+            .app_data(state.clone())
+            .app_data(broadcaster.clone())
+            .service(start_timer)
+            .service(stop_timer)
+            .service(reset_timer)
+            .service(events)
+    })
+    .bind(("0.0.0.0", 8080))?
+    .run()
+    .await;
+
+    Ok(())
 }
 
 pub fn spawn_server(sender: mpsc::Sender<InputEvent>) -> JoinHandle<()> {
     spawn(|| {
-        run_server(sender).unwrap();
+        rt::System::new().block_on(init_server(sender)).unwrap();
     })
 }
