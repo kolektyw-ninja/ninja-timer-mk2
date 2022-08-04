@@ -1,9 +1,13 @@
 use std::time::{Instant, Duration};
 
+use chrono::{DateTime, Utc};
+
 #[derive(Debug, Clone, Copy)]
 pub struct Timer {
     started_at: Option<Instant>,
+    started_at_datetime: Option<DateTime<Utc>>,
     stopped_at: Option<Instant>,
+    stopped_at_datetime: Option<DateTime<Utc>>,
     countdown_duration: Duration,
 }
 
@@ -19,7 +23,9 @@ impl Timer {
     pub fn new(countdown_seconds: u64) -> Self {
         Self {
             started_at: None,
+            started_at_datetime: None,
             stopped_at: None,
+            stopped_at_datetime: None,
             countdown_duration: Duration::from_secs(countdown_seconds),
         }
     }
@@ -27,6 +33,7 @@ impl Timer {
     pub fn start(&mut self) -> Result<(), String> {
         if self.get_state() == TimerState::Reset {
             self.started_at = Some(Instant::now());
+            self.started_at_datetime = Some(Utc::now());
             Ok(())
         } else {
             Err("Timer hasn't been reset".to_string())
@@ -36,6 +43,7 @@ impl Timer {
     pub fn stop(&mut self) -> Result<(), String> {
         if self.get_state() == TimerState::Running {
             self.stopped_at = Some(Instant::now());
+            self.stopped_at_datetime = Some(Utc::now());
             Ok(())
         } else {
             Err("Timer isn't running".to_string())
@@ -51,7 +59,9 @@ impl Timer {
 
     pub fn reset(&mut self) {
         self.started_at = None;
+        self.started_at_datetime = None;
         self.stopped_at = None;
+        self.stopped_at_datetime = None;
     }
 
     pub fn get_state(&self) -> TimerState {

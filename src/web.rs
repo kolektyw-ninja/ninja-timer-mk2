@@ -13,6 +13,8 @@ use actix_web::{
     Responder,
 };
 
+use actix_files as fs;
+
 use crate::state::{InputEvent, OutputEvent};
 use crate::broadcast::Broadcaster;
 
@@ -69,7 +71,7 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
 
     spawn(move || {
         for event in receiver {
-            clone.send(&format!("{:?}", event));
+            clone.send("stateChanged", &format!("{:?}", event));
         }
     });
 
@@ -82,6 +84,7 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
             .service(reset_timer)
             .service(request_sync)
             .service(events)
+            .service(fs::Files::new("/", "./static").index_file("index.html"))
     })
     .bind(("0.0.0.0", 8080))?
     .run()

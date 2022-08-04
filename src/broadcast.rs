@@ -54,7 +54,7 @@ impl Broadcaster {
 
         let mut ok_clients = Vec::new();
         for client in inner.clients.iter() {
-            let result = client.clone().try_send(Bytes::from("data: ping\n\n"));
+            let result = client.clone().try_send(Bytes::from("event: ping\ndata: ping\n\n"));
 
             if let Ok(()) = result {
                 ok_clients.push(client.clone());
@@ -74,8 +74,17 @@ impl Broadcaster {
         Client(rx)
     }
 
-    pub fn send(&self, msg: &str) {
+    pub fn send_data(&self, msg: &str) {
         let msg = Bytes::from(["data: ", msg, "\n\n"].concat());
+
+        let inner = self.inner.lock();
+        for client in inner.clients.iter() {
+            client.clone().try_send(msg.clone()).unwrap_or(());
+        }
+    }
+
+    pub fn send(&self, event: &str, msg: &str) {
+        let msg = Bytes::from(format!("event: {}\ndata: {}\n\n", event, msg));
 
         let inner = self.inner.lock();
         for client in inner.clients.iter() {
