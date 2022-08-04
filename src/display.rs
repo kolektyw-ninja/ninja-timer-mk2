@@ -73,7 +73,7 @@ impl Display {
 
         let mut event_pump = sdl_context.event_pump()?;
 
-        let mut _frame_duration = Duration::ZERO;
+        let mut frame_duration = Duration::ZERO;
         let mut last_millis = 0;
         let mut last_state = self.timers[0].get_state();
 
