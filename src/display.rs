@@ -64,14 +64,16 @@ impl Display {
 
         let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
         let texture_creator = canvas.texture_creator();
-        let background = texture_creator.load_texture_bytes(assets::BACKGROUND)?;
+        let _background = texture_creator.load_texture_bytes(assets::BACKGROUND)?;
 
-        canvas.copy(&background, None, None)?;
+        //canvas.copy(&background, None, None)?;
+        canvas.set_draw_color(Color::RGB(0, 0, 0));
+        canvas.clear();
         canvas.present();
+
         let mut event_pump = sdl_context.event_pump()?;
 
-        let mut frame_duration = Duration::ZERO;
-
+        let mut _frame_duration = Duration::ZERO;
         let mut last_millis = 0;
         let mut last_state = self.timers[0].get_state();
 
@@ -98,11 +100,28 @@ impl Display {
             let height = viewport.height();
 
             let timer = self.timers[0];
-            font.set_size(height as u16 / 5);
+            font.set_size(height as u16 / 3);
 
-            canvas.copy(&background, None, None)?;
-            render_text(&timer.format(), &Point::new(width as i32 / 2, height as i32 / 2), &font.inner, &mut canvas)?;
-            render_text(&format!("{}", frame_duration.as_millis()), &Point::new(400, 500), &font.inner, &mut canvas)?;
+            canvas.set_draw_color(Color::RGB(0, 0, 0));
+            canvas.clear();
+            //canvas.copy(&background, None, None)?;
+
+            let color = match timer.get_state() {
+                TimerState::CountingDown => Color::RGB(255, 0, 0),
+                TimerState::Stopped => Color::RGB(0, 255, 0),
+                _ => Color::RGB(255, 255, 255),
+            };
+
+            render_text(
+                &timer.format(),
+                &Point::new(width as i32 / 2, height as i32 / 2),
+                &font.inner,
+                &mut canvas,
+                &color,
+            )?;
+
+            //render_text(&format!("{}", frame_duration.as_millis()), &Point::new(400, 500), &font.inner, &mut canvas)?;
+
             canvas.present();
 
             // Audio
@@ -209,12 +228,12 @@ impl<'a> Clip<'a> {
     }
 }
 
-fn render_text(text: &str, point: &Point, font: &Font, canvas: &mut Canvas<Window>) -> Result<(), String> {
+fn render_text(text: &str, point: &Point, font: &Font, canvas: &mut Canvas<Window>, color: &Color) -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
 
     let surface = font
         .render(text)
-        .blended(Color::RGBA(255, 255, 255, 255))
+        .blended(*color)
         .map_err(|e| e.to_string())?;
 
     let texture = texture_creator

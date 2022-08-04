@@ -15,7 +15,6 @@ use web::spawn_server;
 use gpio::spawn_gpio;
 
 pub fn main() -> Result<(), String> {
-    // old main body
     let (input_tx, input_rx) = mpsc::channel();
     let (output_tx, output_rx) = mpsc::channel();
     let _server_handle = spawn_server(input_tx.clone(), output_rx);
