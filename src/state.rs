@@ -8,6 +8,7 @@ pub enum InputEvent {
     StopTimer(usize),
     ResetTimer(usize),
     RequestSync,
+    SetButtonState(bool),
 }
 
 #[derive(Debug, Clone)]
@@ -55,6 +56,13 @@ impl StateManager {
             },
             InputEvent::RequestSync => {
                 self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+            },
+            InputEvent::SetButtonState(state) => {
+                if state {
+                    if let Ok(_) = self.get_timer_mut(0)?.stop() {
+                        self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+                    }
+                }
             },
             #[allow(unreachable_patterns)]
             _ => return Err(format!("Couldn't process: {:?}", event)),

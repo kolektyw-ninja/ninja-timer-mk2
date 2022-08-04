@@ -4,6 +4,7 @@ mod state;
 mod assets;
 mod web;
 mod broadcast;
+mod gpio;
 
 use std::thread;
 use std::sync::mpsc;
@@ -11,18 +12,21 @@ use std::sync::mpsc;
 use display::Display;
 use state::{StateManager};
 use web::spawn_server;
-
+use gpio::spawn_gpio;
 
 pub fn main() -> Result<(), String> {
+    // old main body
     let (input_tx, input_rx) = mpsc::channel();
     let (output_tx, output_rx) = mpsc::channel();
-    let _server_handle = spawn_server(input_tx, output_rx);
+    let _server_handle = spawn_server(input_tx.clone(), output_rx);
 
     let (display_tx, display_rx) = mpsc::channel();
     let mut display = Display::new(display_rx);
     let display_handle = thread::spawn(move || {
         display.show_windows().unwrap();
     });
+
+    let _gpio_handle = spawn_gpio(input_tx);
 
     let mut state_manager = StateManager::new();
     state_manager.add_listener(display_tx);

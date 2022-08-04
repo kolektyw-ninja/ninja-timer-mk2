@@ -10,6 +10,7 @@ actix-web = "4"
 futures-util = "*"
 parking_lot = "*"
 tokio = "*"
+rppal = "*"
 
 [dependencies.sdl2]
 version = "0.35"
