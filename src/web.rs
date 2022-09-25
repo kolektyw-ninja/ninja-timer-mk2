@@ -1,5 +1,6 @@
 use std::thread::{spawn, JoinHandle};
 use std::sync::{mpsc, Mutex};
+use serde_json::json;
 
 use actix_web::{
     rt,
@@ -14,6 +15,7 @@ use actix_web::{
 };
 
 use actix_files as fs;
+use chrono::Utc;
 
 use crate::state::{InputEvent, OutputEvent};
 use crate::broadcast::Broadcaster;
@@ -71,7 +73,23 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
 
     spawn(move || {
         for event in receiver {
-            clone.send("stateChanged", &format!("{:?}", event));
+            match event {
+                OutputEvent::SyncTimers(timers) => {
+                    let payload = json!({
+                        "timer": {
+                            "startedAt": timers[0].started_at_datetime.map(|x| x.to_rfc3339()),
+                            "stoppedAt": timers[0].stopped_at_datetime.map(|x| x.to_rfc3339()),
+                            "countdown": timers[0].countdown_duration.as_secs(),
+                            "state": format!("{:?}", timers[0].get_state()),
+                            "formatted": timers[0].format(),
+                        },
+                        "now": Utc::now().to_rfc3339(),
+                    });
+
+                    clone.send("syncTimers", &payload.to_string());
+                },
+                _ => clone.send("outputEvent", &format!("{:?}", event))
+            };
         }
     });
 

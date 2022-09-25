@@ -59,7 +59,7 @@ impl Display {
 
         let window = video_subsystem
             .window("ninja-timer", width, height)
-            .fullscreen()
+            .fullscreen_desktop()
             .opengl()
             .build()
             .map_err(|e| e.to_string())?;

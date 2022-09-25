@@ -3,11 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <title>Ninja timer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-  <button id="start">Start</button>
-  <button id="stop">Stop</button>
-  <button id="reset">Reset</button>
-  <script src="/index.js"></script>
+  <section class="section">
+    <div class="container">
+      <p id="timerDisplay" class="is-size-1" style="font-family: mono">00:00.00<p>
+
+      <span class="label">Sterowanie</span>
+      <div class="field is-grouped">
+        <div class="control">
+          <button id="start" class="button">
+            <span class="icon"><i class="fas fa-play"></i></span>
+            <span>Start</span>
+          </button>
+        </div>
+        <div class="control">
+          <button id="stop" class="button">
+            <span class="icon"><i class="fas fa-stop"></i></span>
+            <span>Stop</span>
+          </button>
+        </div>
+        <div class="control">
+          <button id="reset" class="button">
+            <span class="icon"><i class="fas fa-arrow-rotate-left"></i></span>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">Ustawienia</p>
+          <button class="card-header-icon"><span class="icon"><i class="fas fa-angle-down"></i></span></button>
+        </header>
+        <div class="card-content">
+          <form id="settings">
+            <div class="field">
+              <label class="label">
+                Odliczanie (s)
+                <input class="input" type="number" />
+              </label>
+            </div>
+
+            <span class="label">Tło</span>
+            <div class="file has-name">
+              <label class="file-label">
+                <input class="file-input" type="file" name="resume">
+                <span class="file-cta">
+                  <span class="file-icon">
+                    <i class="fas fa-upload"></i>
+                  </span>
+                  <span class="file-label">
+                    Wybierz tło
+                  </span>
+                </span>
+                <span class="file-name">Brak pliku</span>
+              </label>
+            </div>
+
+            <div class="field">
+              <div class="control">
+                <button class="button is-danger">
+                  <span class="icon"><i class="fas fa-trash"></i></span>
+                  <span>Usuń tło</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="control">
+                <button class="button">
+                  <span class="icon"><i class="fas fa-floppy-disk"></i></span>
+                  <span>Zapisz</span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="./index.js"></script>
 </body>
 </html>

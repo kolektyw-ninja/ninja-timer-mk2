@@ -5,13 +5,13 @@ use chrono::{DateTime, Utc};
 #[derive(Debug, Clone, Copy)]
 pub struct Timer {
     started_at: Option<Instant>,
-    started_at_datetime: Option<DateTime<Utc>>,
+    pub started_at_datetime: Option<DateTime<Utc>>,
     stopped_at: Option<Instant>,
-    stopped_at_datetime: Option<DateTime<Utc>>,
-    countdown_duration: Duration,
+    pub stopped_at_datetime: Option<DateTime<Utc>>,
+    pub countdown_duration: Duration,
 }
 
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Debug)]
 pub enum TimerState {
     Reset,
     CountingDown,

@@ -745,6 +745,7 @@ dependencies = [
  "parking_lot",
  "rppal",
  "sdl2",
+ "serde_json",
  "tokio",
 ]
 
