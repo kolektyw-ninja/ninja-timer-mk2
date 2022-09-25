@@ -5,6 +5,7 @@ mod assets;
 mod web;
 mod broadcast;
 mod gpio;
+mod ip;
 
 use std::thread;
 use std::sync::mpsc;
@@ -15,6 +16,8 @@ use web::spawn_server;
 use gpio::spawn_gpio;
 
 pub fn main() -> Result<(), String> {
+    wait_for_network();
+
     let (input_tx, input_rx) = mpsc::channel();
     let (output_tx, output_rx) = mpsc::channel();
     let _server_handle = spawn_server(input_tx.clone(), output_rx);
@@ -40,3 +43,17 @@ pub fn main() -> Result<(), String> {
     Ok(())
 }
 
+fn wait_for_network() {
+    let mut counter = 0;
+
+    loop {
+        let ips = ip::get_ips().unwrap();
+        if ips.len() > 0 {
+            break
+        }
+
+        println!("Waiting for network #{}", counter);
+        std::thread::sleep(std::time::Duration::from_secs(1));
+        counter += 1;
+    }
+}
