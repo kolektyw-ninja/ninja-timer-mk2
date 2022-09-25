@@ -34,6 +34,7 @@ impl Display {
     pub fn show_windows(&mut self) -> Result<(), String> {
         let sdl_context = sdl2::init()?;
 
+
         let ttf_context = ttf::init().map_err(|e| e.to_string())?;
         let _image_context = image::init(InitFlag::PNG)?;
 
@@ -53,12 +54,17 @@ impl Display {
             eprintln!("Display {}: {:?}", i, bounds);
         }
 
+        let width = display_bounds[0].w as u32;
+        let height = display_bounds[0].h as u32;
+
         let window = video_subsystem
-            .window("ninja-timer", 800, 600)
-            .fullscreen_desktop()
+            .window("ninja-timer", width, height)
+            .fullscreen()
             .opengl()
             .build()
             .map_err(|e| e.to_string())?;
+
+        sdl_context.mouse().show_cursor(false);
 
         let mut font = ResizeableFont::load_from_bytes(&ttf_context, assets::FONT, 64)?;
 
