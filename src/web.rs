@@ -115,6 +115,12 @@ async fn upload_background(data: web::Data<AppState>, mut payload: Multipart) ->
     Ok(HttpResponse::Ok().body("OK").into())
 }
 
+#[post("api/toggle_display")]
+async fn toggle_display(data: web::Data<AppState>) -> impl Responder {
+    data.send(InputEvent::ToggleDisplay);
+    HttpResponse::Ok().body("OK")
+}
+
 #[get("/api/events")]
 async fn events(broadcaster: web::Data<Broadcaster>) -> impl Responder {
     let client = broadcaster.new_client();
@@ -176,6 +182,7 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
             .service(set_countdown)
             .service(delete_background)
             .service(upload_background)
+            .service(toggle_display)
             .service(fs::Files::new("/", "./dist").index_file("index.html"))
     })
     .bind(("0.0.0.0", 8080))?

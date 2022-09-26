@@ -24,6 +24,8 @@ pub struct Display {
     settings: Option<Settings>,
     info: Option<Info>,
     should_reload_background: bool,
+    is_shown: bool,
+    should_toggle_visibility: bool,
 }
 
 const TARGET_FRAME_DURATION: Duration = Duration::from_millis(1000 / 30);
@@ -36,6 +38,8 @@ impl Display {
             settings: None,
             info: None,
             should_reload_background: true,
+            is_shown: true,
+            should_toggle_visibility: false,
         }
     }
 
@@ -111,6 +115,19 @@ impl Display {
             }
 
             self.handle_messages()?;
+
+            if self.should_toggle_visibility {
+                if self.is_shown {
+                    println!("Hiding display");
+                    canvas.window_mut().hide();
+                } else {
+                    println!("Showing display");
+                    canvas.window_mut().show();
+                }
+
+                self.is_shown = !self.is_shown;
+                self.should_toggle_visibility = false;
+            }
 
             if self.should_reload_background {
                 background = if bg_path.is_file() {
@@ -237,6 +254,7 @@ impl Display {
                     OutputEvent::SyncSettings(settings) => self.settings = Some(settings),
                     OutputEvent::SyncInfo(info) => self.info = Some(info),
                     OutputEvent::ReloadBackground => self.should_reload_background = true,
+                    OutputEvent::ToggleDisplay => self.should_toggle_visibility = true,
                     #[allow(unreachable_patterns)]
                     _ => (),
                 },

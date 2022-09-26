@@ -14,6 +14,7 @@ pub enum InputEvent {
     SetDebug(bool),
     SetCountdown(u64),
     ReloadBackground,
+    ToggleDisplay,
 }
 
 #[derive(Debug, Clone)]
@@ -22,6 +23,7 @@ pub enum OutputEvent {
     SyncSettings(Settings),
     SyncInfo(Info),
     ReloadBackground,
+    ToggleDisplay,
 }
 
 pub struct StateManager {
@@ -100,6 +102,9 @@ impl StateManager {
             InputEvent::ReloadBackground => {
                 self.notify_listeners(&OutputEvent::ReloadBackground)?;
             },
+            InputEvent::ToggleDisplay => {
+                self.notify_listeners(&OutputEvent::ToggleDisplay)?;
+            },
             #[allow(unreachable_patterns)]
             _ => return Err(format!("Couldn't process: {:?}", event)),
         }
@@ -129,6 +134,7 @@ impl StateManager {
             .filter(Result::is_err);
 
         for error in errors {
+            // TODO: remove instead
             println!("{:?}", error)
         }
 

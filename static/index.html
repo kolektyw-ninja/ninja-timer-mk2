@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="npm:bulma/css/bulma.css">
   <link rel="stylesheet" href="npm:@fortawesome/fontawesome-free/css/all.css">
+  <style>
+  .is-pointer {
+    cursor: pointer;
+  }
+  </style>
 </head>
 <body>
   <section class="section">
@@ -43,9 +48,9 @@
       </div>
 
       <div class="card">
-        <header class="card-header">
+        <header class="card-header is-pointer" id="settingsDropdownButton">
           <p class="card-header-title">Ustawienia</p>
-          <button class="card-header-icon" id="settingsDropdownButton"><span class="icon"><i class="fas fa-angle-down" id="settingsDropdownIcon"></i></span></button>
+          <button class="card-header-icon"><span class="icon"><i class="fas fa-angle-down" id="settingsDropdownIcon"></i></span></button>
         </header>
         <div class="card-content is-hidden" id="settingsContent">
           <form id="settings">
