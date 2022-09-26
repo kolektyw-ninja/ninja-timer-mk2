@@ -102,6 +102,14 @@ impl StateManager {
         Ok(())
     }
 
+    pub fn sync_all(&mut self) -> Result<(), String> {
+        self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+        self.notify_listeners(&OutputEvent::SyncSettings(self.settings.clone()))?;
+        self.notify_listeners(&OutputEvent::SyncInfo(self.info.clone()))?;
+
+        Ok(())
+    }
+
     fn get_timer_mut(&mut self, id: usize) -> Result<&mut Timer, String> {
         match self.timers.get_mut(id) {
             Some(timer) => Ok(timer),

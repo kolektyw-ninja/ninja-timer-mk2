@@ -35,6 +35,7 @@ pub fn main() -> Result<(), String> {
     state_manager.add_listener(display_tx);
     state_manager.add_listener(output_tx);
 
+    state_manager.sync_all().unwrap();
     for event in input_rx {
         state_manager.process(event).unwrap();
     }
