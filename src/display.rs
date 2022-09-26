@@ -7,14 +7,14 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect, Point};
-use sdl2::render::{Canvas, TextureQuery};
+use sdl2::render::{Canvas, TextureQuery, Texture};
 use sdl2::video::Window;
 use sdl2::rwops::RWops;
 use sdl2::mixer::{self, Music};
 
 use crate::state::OutputEvent;
 use crate::timer::{Timer, TimerState};
-use crate::assets;
+use crate::assets::{self, get_background_path};
 use crate::settings::Settings;
 use crate::info::Info;
 
@@ -23,6 +23,7 @@ pub struct Display {
     timers: Vec<Timer>,
     settings: Option<Settings>,
     info: Option<Info>,
+    should_reload_background: bool,
 }
 
 const TARGET_FRAME_DURATION: Duration = Duration::from_millis(1000 / 30);
@@ -34,6 +35,7 @@ impl Display {
             timers: vec![Timer::new(0)],
             settings: None,
             info: None,
+            should_reload_background: true,
         }
     }
 
@@ -73,11 +75,14 @@ impl Display {
         sdl_context.mouse().show_cursor(false);
 
         let mut font = ResizeableFont::load_from_bytes(&ttf_context, assets::FONT, 64)?;
-        let mut debug_font = ResizeableFont::load_from_bytes(&ttf_context, assets::FONT, 20)?;
+        let debug_font = ResizeableFont::load_from_bytes(&ttf_context, assets::FONT, 20)?;
 
         let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
         let texture_creator = canvas.texture_creator();
-        let _background = texture_creator.load_texture_bytes(assets::BACKGROUND)?;
+
+        let bg_path = get_background_path();
+
+        let mut background: Option<Texture> = None;
 
         //canvas.copy(&background, None, None)?;
         canvas.set_draw_color(Color::RGB(0, 0, 0));
@@ -107,6 +112,16 @@ impl Display {
 
             self.handle_messages()?;
 
+            if self.should_reload_background {
+                background = if bg_path.is_file() {
+                    Some(texture_creator.load_texture(&bg_path)?)
+                } else {
+                    None
+                };
+
+                self.should_reload_background = false;
+            }
+
             // Drawing
             let viewport = canvas.viewport();
             let width = viewport.width();
@@ -117,7 +132,10 @@ impl Display {
 
             canvas.set_draw_color(Color::RGB(0, 0, 0));
             canvas.clear();
-            //canvas.copy(&background, None, None)?;
+
+            if let Some(ref bg) = background {
+                canvas.copy(bg, None, None)?;
+            }
 
             let color = match timer.get_state() {
                 TimerState::CountingDown => Color::RGB(255, 0, 0),
@@ -133,8 +151,6 @@ impl Display {
                 &color,
                 Align::Center,
             )?;
-
-            //render_text(&format!("{}", frame_duration.as_millis()), &Point::new(400, 500), &font.inner, &mut canvas)?;
 
             // Debug
             if self.debug_enabled() {
@@ -220,6 +236,7 @@ impl Display {
                     },
                     OutputEvent::SyncSettings(settings) => self.settings = Some(settings),
                     OutputEvent::SyncInfo(info) => self.info = Some(info),
+                    OutputEvent::ReloadBackground => self.should_reload_background = true,
                     #[allow(unreachable_patterns)]
                     _ => (),
                 },

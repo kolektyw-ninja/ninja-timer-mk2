@@ -13,6 +13,7 @@ pub enum InputEvent {
     SetButtonState(bool),
     SetDebug(bool),
     SetCountdown(u64),
+    ReloadBackground,
 }
 
 #[derive(Debug, Clone)]
@@ -20,6 +21,7 @@ pub enum OutputEvent {
     SyncTimers(Vec<Timer>),
     SyncSettings(Settings),
     SyncInfo(Info),
+    ReloadBackground,
 }
 
 pub struct StateManager {
@@ -94,6 +96,9 @@ impl StateManager {
                 self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
 
                 self.settings.save().unwrap();
+            },
+            InputEvent::ReloadBackground => {
+                self.notify_listeners(&OutputEvent::ReloadBackground)?;
             },
             #[allow(unreachable_patterns)]
             _ => return Err(format!("Couldn't process: {:?}", event)),

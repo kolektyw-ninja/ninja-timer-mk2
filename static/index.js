@@ -11,6 +11,8 @@ const countdownInput = document.getElementById("countdownInput")
 const countdownSaveButton = document.getElementById("countdownSaveButton")
 const countdownSaveIcon = document.getElementById("countdownSaveIcon")
 
+const deleteBackgroundButton = document.getElementById("deleteBackgroundButton")
+
 const events = new EventSource("/api/events")
 
 let timer = null
@@ -109,6 +111,12 @@ countdownSaveButton.addEventListener("click", e => {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({ countdown: parseInt(countdownInput.value) })
+  })
+})
+
+deleteBackgroundButton.addEventListener("click", e => {
+  fetch("/api/delete_background", {
+    method: "POST",
   })
 })
 

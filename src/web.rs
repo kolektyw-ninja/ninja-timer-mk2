@@ -1,5 +1,7 @@
 use std::thread::{spawn, JoinHandle};
 use std::sync::{mpsc, Mutex};
+use std::fs::remove_file;
+
 use serde_json::json;
 use serde::Deserialize;
 
@@ -20,6 +22,7 @@ use chrono::Utc;
 
 use crate::state::{InputEvent, OutputEvent};
 use crate::broadcast::Broadcaster;
+use crate::assets::get_background_path;
 
 struct AppState {
     sender: Mutex<mpsc::Sender<InputEvent>>,
@@ -75,6 +78,13 @@ struct Countdown {
 #[post("api/set_countdown")]
 async fn set_countdown(data: web::Data<AppState>, info: web::Json<Countdown>) -> impl Responder {
     data.send(InputEvent::SetCountdown(info.countdown));
+    HttpResponse::Ok().body("OK")
+}
+
+#[post("api/delete_background")]
+async fn delete_background(data: web::Data<AppState>) -> impl Responder {
+    remove_file(get_background_path()).unwrap();
+    data.send(InputEvent::ReloadBackground);
     HttpResponse::Ok().body("OK")
 }
 
@@ -137,6 +147,7 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
             .service(enable_debug)
             .service(disable_debug)
             .service(set_countdown)
+            .service(delete_background)
             .service(fs::Files::new("/", "./static").index_file("index.html"))
     })
     .bind(("0.0.0.0", 8080))?
