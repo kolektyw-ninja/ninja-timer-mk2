@@ -5,7 +5,7 @@ mod assets;
 mod web;
 mod broadcast;
 mod gpio;
-mod ip;
+mod info;
 mod settings;
 
 use std::thread;
@@ -48,7 +48,7 @@ fn wait_for_network() {
     let mut counter = 0;
 
     loop {
-        let ips = ip::get_ips().unwrap();
+        let ips = info::get_ips().unwrap();
         if ips.len() > 0 {
             break
         }

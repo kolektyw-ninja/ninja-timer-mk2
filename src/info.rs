@@ -1,6 +1,21 @@
 use std::process::Command;
 use std::io::Result;
 
+#[derive(Debug, Clone)]
+pub struct Info {
+    pub ips: Vec<String>,
+}
+
+impl Info {
+    pub fn get() -> Result<Self> {
+        let info = Info {
+            ips: get_ips()?,
+        };
+
+        Ok(info)
+    }
+}
+
 pub fn get_ips() -> Result<Vec<String>> {
     let output = Command::new("ip")
         .arg("addr")

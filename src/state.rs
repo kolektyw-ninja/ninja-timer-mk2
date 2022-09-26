@@ -2,6 +2,7 @@ use std::sync::mpsc;
 
 use crate::timer::Timer;
 use crate::settings::Settings;
+use crate::info::Info;
 
 #[derive(Debug)]
 pub enum InputEvent {
@@ -18,12 +19,14 @@ pub enum InputEvent {
 pub enum OutputEvent {
     SyncTimers(Vec<Timer>),
     SyncSettings(Settings),
+    SyncInfo(Info),
 }
 
 pub struct StateManager {
     listeners: Vec<mpsc::Sender<OutputEvent>>,
     timers: Vec<Timer>,
     settings: Settings,
+    info: Info,
 }
 
 impl StateManager {
@@ -38,7 +41,8 @@ impl StateManager {
         Self {
             listeners: vec![],
             timers: vec![Timer::new(settings.countdown)],
-            settings
+            settings,
+            info: Info::get().unwrap(),
         }
     }
 
@@ -69,6 +73,7 @@ impl StateManager {
             InputEvent::RequestSync => {
                 self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                 self.notify_listeners(&OutputEvent::SyncSettings(self.settings.clone()))?;
+                self.notify_listeners(&OutputEvent::SyncInfo(self.info.clone()))?;
             },
             InputEvent::SetButtonState(state) => {
                 if state {

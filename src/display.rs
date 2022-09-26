@@ -15,10 +15,14 @@ use sdl2::mixer::{self, Music};
 use crate::state::OutputEvent;
 use crate::timer::{Timer, TimerState};
 use crate::assets;
+use crate::settings::Settings;
+use crate::info::Info;
 
 pub struct Display {
     receiver: mpsc::Receiver<OutputEvent>,
     timers: Vec<Timer>,
+    settings: Option<Settings>,
+    info: Option<Info>,
 }
 
 const TARGET_FRAME_DURATION: Duration = Duration::from_millis(1000 / 30);
@@ -28,6 +32,8 @@ impl Display {
         Self {
             receiver,
             timers: vec![Timer::new(0)],
+            settings: None,
+            info: None,
         }
     }
 
@@ -67,6 +73,7 @@ impl Display {
         sdl_context.mouse().show_cursor(false);
 
         let mut font = ResizeableFont::load_from_bytes(&ttf_context, assets::FONT, 64)?;
+        let mut debug_font = ResizeableFont::load_from_bytes(&ttf_context, assets::FONT, 20)?;
 
         let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
         let texture_creator = canvas.texture_creator();
@@ -79,7 +86,7 @@ impl Display {
 
         let mut event_pump = sdl_context.event_pump()?;
 
-        let mut frame_duration: Duration;
+        let mut frame_duration: Duration = TARGET_FRAME_DURATION;
         let mut last_millis = 0;
         let mut last_state = self.timers[0].get_state();
 
@@ -124,9 +131,41 @@ impl Display {
                 &font.inner,
                 &mut canvas,
                 &color,
+                Align::Center,
             )?;
 
             //render_text(&format!("{}", frame_duration.as_millis()), &Point::new(400, 500), &font.inner, &mut canvas)?;
+
+            // Debug
+            if self.debug_enabled() {
+                let ips = if let Some(ref info) = self.info {
+                    info.ips.clone()
+                } else {
+                    vec![]
+                };
+
+                canvas.set_draw_color(Color::RGB(255, 255, 255));
+                canvas.fill_rect(Rect::new(0, 0, width, 200))?;
+
+                render_text(
+                    &format!("IP: {}", ips.join(", ")),
+                    &Point::new(10, 10),
+                    &debug_font.inner,
+                    &mut canvas,
+                    &Color::RGB(0, 0, 0),
+                    Align::TopLeft,
+                )?;
+
+                render_text(
+                    &format!("FPS: {:.02}", 1000/frame_duration.as_millis()),
+                    &Point::new(10, 30),
+                    &debug_font.inner,
+                    &mut canvas,
+                    &Color::RGB(0, 0, 0),
+                    Align::TopLeft,
+                )?;
+
+            }
 
             canvas.present();
 
@@ -159,6 +198,18 @@ impl Display {
         Ok(())
     }
 
+    fn debug_enabled(&self) -> bool {
+        if let None = self.settings {
+            return false
+        }
+
+        if let Some(Settings { show_debug: false, .. }) = self.settings {
+            return false
+        }
+
+        true
+    }
+
     fn handle_messages(&mut self) -> Result<(), String> {
         loop {
             match self.receiver.try_recv() {
@@ -167,6 +218,8 @@ impl Display {
                     OutputEvent::SyncTimers(timers) => {
                         self.timers = timers;
                     },
+                    OutputEvent::SyncSettings(settings) => self.settings = Some(settings),
+                    OutputEvent::SyncInfo(info) => self.info = Some(info),
                     #[allow(unreachable_patterns)]
                     _ => (),
                 },
@@ -234,7 +287,12 @@ impl<'a> Clip<'a> {
     }
 }
 
-fn render_text(text: &str, point: &Point, font: &Font, canvas: &mut Canvas<Window>, color: &Color) -> Result<(), String> {
+enum Align {
+    Center,
+    TopLeft,
+}
+
+fn render_text(text: &str, point: &Point, font: &Font, canvas: &mut Canvas<Window>, color: &Color, align: Align) -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
 
     let surface = font
@@ -247,7 +305,11 @@ fn render_text(text: &str, point: &Point, font: &Font, canvas: &mut Canvas<Windo
         .map_err(|e| e.to_string())?;
 
     let TextureQuery { width, height, .. } = texture.query();
-    let rect = Rect::new(point.x() - (width as i32) / 2, point.y() - (height as i32) / 2, width, height);
+    let rect = match align {
+        Align::Center =>
+            Rect::new(point.x() - (width as i32) / 2, point.y() - (height as i32) / 2, width, height),
+        Align::TopLeft => Rect::new(point.x(), point.y(), width, height),
+    };
 
     canvas.copy(&texture, None, rect)
 }
