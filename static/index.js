@@ -18,7 +18,7 @@ const settingsDropdownButton = document.getElementById("settingsDropdownButton")
 const settingsDropdownIcon = document.getElementById("settingsDropdownIcon")
 const settingsContent = document.getElementById("settingsContent")
 
-const events = new EventSource("/api/events")
+const noConnectionMessage = document.getElementById("noConnectionMessage")
 
 let timer = null
 let settings = null
@@ -68,23 +68,6 @@ const updateTimerDisplay = () => {
   }
 }
 
-events.addEventListener("syncTimers", e => {
-  const data = JSON.parse(e.data)
-  const newTimer = data.timer
-
-  if (newTimer.startedAt != null) {
-    newTimer.startedAt = Date.parse(newTimer.startedAt)
-  }
-
-  if (newTimer.stoppedAt != null) {
-    newTimer.stoppedAt = Date.parse(newTimer.stoppedAt)
-  }
-
-  timer = newTimer
-  timerClockOffset = Date.parse(data.now) - Date.now()
-
-  updateButtons()
-})
 
 const updateSettings = () => {
   if (settings == null) {
@@ -146,12 +129,6 @@ settingsDropdownButton.addEventListener("click", _ => {
   }
 })
 
-events.addEventListener("syncSettings", e => {
-  const data = JSON.parse(e.data)
-  settings = data.settings
-
-  updateSettings()
-})
 
 fetch("/api/request_sync", {
   method: "POST",
@@ -194,5 +171,64 @@ const frameCallback = () => {
   updateTimerDisplay()
   requestAnimationFrame(frameCallback)
 }
+
+let events = null
+let lastPing = Date.now()
+let keepAliveInterval = null
+
+const setupEvents = () => {
+  events = new EventSource("/api/events")
+
+  events.addEventListener("open", _ => {
+    noConnectionMessage.classList.add("is-hidden")
+    clearInterval(keepAliveInterval)
+
+    lastPing = Date.now()
+    keepAliveInternal = setInterval(_ => {
+      const timeSincePing = Date.now() - lastPing
+      if (timeSincePing > 11000) {
+        events.close()
+        noConnectionMessage.classList.remove("is-hidden")
+        setupEvents()
+      }
+    }, 1000)
+  })
+
+  events.addEventListener("error", _ => {
+    noConnectionMessage.classList.remove("is-hidden")
+  })
+
+  events.addEventListener("syncTimers", e => {
+    const data = JSON.parse(e.data)
+    const newTimer = data.timer
+
+    if (newTimer.startedAt != null) {
+      newTimer.startedAt = Date.parse(newTimer.startedAt)
+    }
+
+    if (newTimer.stoppedAt != null) {
+      newTimer.stoppedAt = Date.parse(newTimer.stoppedAt)
+    }
+
+    timer = newTimer
+    timerClockOffset = Date.parse(data.now) - Date.now()
+
+    updateButtons()
+  })
+
+
+  events.addEventListener("ping", _ => {
+    lastPing = Date.now()
+  })
+
+  events.addEventListener("syncSettings", e => {
+    const data = JSON.parse(e.data)
+    settings = data.settings
+
+    updateSettings()
+  })
+}
+
+setupEvents()
 
 frameCallback()
