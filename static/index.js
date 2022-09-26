@@ -12,6 +12,7 @@ const countdownSaveButton = document.getElementById("countdownSaveButton")
 const countdownSaveIcon = document.getElementById("countdownSaveIcon")
 
 const deleteBackgroundButton = document.getElementById("deleteBackgroundButton")
+const backgroundInput = document.getElementById("backgroundInput")
 
 const events = new EventSource("/api/events")
 
@@ -117,6 +118,15 @@ countdownSaveButton.addEventListener("click", e => {
 deleteBackgroundButton.addEventListener("click", e => {
   fetch("/api/delete_background", {
     method: "POST",
+  })
+})
+
+backgroundInput.addEventListener("change", e => {
+  const data = new FormData()
+  data.append("background", e.target.files[0])
+  fetch("/api/upload_background", {
+    method: "POST",
+    body: data,
   })
 })
 

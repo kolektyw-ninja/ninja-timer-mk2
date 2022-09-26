@@ -1,6 +1,7 @@
 use std::thread::{spawn, JoinHandle};
 use std::sync::{mpsc, Mutex};
 use std::fs::remove_file;
+use std::io::Write;
 
 use serde_json::json;
 use serde::Deserialize;
@@ -15,9 +16,13 @@ use actix_web::{
     HttpResponse,
     HttpServer,
     Responder,
+    Error,
 };
-
 use actix_files as fs;
+use actix_multipart::Multipart;
+
+use futures_util::TryStreamExt as _;
+
 use chrono::Utc;
 
 use crate::state::{InputEvent, OutputEvent};
@@ -88,6 +93,28 @@ async fn delete_background(data: web::Data<AppState>) -> impl Responder {
     HttpResponse::Ok().body("OK")
 }
 
+#[post("api/upload_background")]
+async fn upload_background(data: web::Data<AppState>, mut payload: Multipart) -> Result<HttpResponse, Error> {
+    let filepath = get_background_path();
+
+    // iterate over multipart stream
+    while let Some(mut field) = payload.try_next().await? {
+        // File::create is blocking operation, use threadpool
+        let path = filepath.clone();
+        let mut f = web::block(move || std::fs::File::create(path)).await??;
+
+        // Field in turn is stream of *Bytes* object
+        while let Some(chunk) = field.try_next().await? {
+            // filesystem operations are blocking, we have to use threadpool
+            f = web::block(move || f.write_all(&chunk).map(|_| f)).await??;
+        }
+    }
+
+    println!("file uploaded");
+    data.send(InputEvent::ReloadBackground);
+    Ok(HttpResponse::Ok().body("OK").into())
+}
+
 #[get("/api/events")]
 async fn events(broadcaster: web::Data<Broadcaster>) -> impl Responder {
     let client = broadcaster.new_client();
@@ -148,6 +175,7 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
             .service(disable_debug)
             .service(set_countdown)
             .service(delete_background)
+            .service(upload_background)
             .service(fs::Files::new("/", "./static").index_file("index.html"))
     })
     .bind(("0.0.0.0", 8080))?
