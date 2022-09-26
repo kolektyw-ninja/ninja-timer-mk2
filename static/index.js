@@ -3,10 +3,14 @@ const stop = document.getElementById("stop")
 const reset = document.getElementById("reset")
 
 const timerDisplay = document.getElementById("timerDisplay")
+const infoButton = document.getElementById("infoButton")
+const infoIcon = document.getElementById("infoIcon")
+const infoButtonText = document.getElementById("infoButtonText")
 
 const events = new EventSource("/api/events")
 
 let timer = null
+let settings = null
 let timerClockOffset = 0
 
 const updateButtons = () => {
@@ -71,9 +75,27 @@ events.addEventListener("syncTimers", e => {
   updateButtons()
 })
 
+const updateSettings = () => {
+  if (settings == null) {
+    return // todo idk
+  }
+
+  if (settings.showDebug) {
+    infoButtonText.innerText = "Schowaj informacje"
+    infoIcon.classList.remove("fa-eye")
+    infoIcon.classList.add("fa-eye-slash")
+  } else {
+    infoButtonText.innerText = "Wyświetl informacje"
+    infoIcon.classList.remove("fa-eye-slash")
+    infoIcon.classList.add("fa-eye")
+  }
+}
+
 events.addEventListener("syncSettings", e => {
   const data = JSON.parse(e.data)
-  console.log(data)
+  settings = data.settings
+
+  updateSettings()
 })
 
 fetch("/api/request_sync", {
@@ -97,8 +119,20 @@ reset.addEventListener("click", e => {
 
 const settingsForm = document.getElementById("settings")
 
-settings.addEventListener("submit", e => {
+settingsForm.addEventListener("submit", e => {
   e.preventDefault()
+})
+
+infoButton.addEventListener("click", e => {
+  if (settings == null) {
+    return
+  }
+
+  if (settings.showDebug) {
+    fetch("/api/disable_debug", { method: "POST" })
+  } else {
+    fetch("/api/enable_debug", { method: "POST" })
+  }
 })
 
 const frameCallback = () => {

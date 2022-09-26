@@ -54,6 +54,18 @@ async fn request_sync(data: web::Data<AppState>) -> impl Responder {
     HttpResponse::Ok().body("OK")
 }
 
+#[post("api/enable_debug")]
+async fn enable_debug(data: web::Data<AppState>) -> impl Responder {
+    data.send(InputEvent::SetDebug(true));
+    HttpResponse::Ok().body("OK")
+}
+
+#[post("api/disable_debug")]
+async fn disable_debug(data: web::Data<AppState>) -> impl Responder {
+    data.send(InputEvent::SetDebug(false));
+    HttpResponse::Ok().body("OK")
+}
+
 #[get("/api/events")]
 async fn events(broadcaster: web::Data<Broadcaster>) -> impl Responder {
     let client = broadcaster.new_client();
@@ -110,6 +122,8 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
             .service(reset_timer)
             .service(request_sync)
             .service(events)
+            .service(enable_debug)
+            .service(disable_debug)
             .service(fs::Files::new("/", "./static").index_file("index.html"))
     })
     .bind(("0.0.0.0", 8080))?
