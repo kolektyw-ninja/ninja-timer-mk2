@@ -7,6 +7,10 @@ const infoButton = document.getElementById("infoButton")
 const infoIcon = document.getElementById("infoIcon")
 const infoButtonText = document.getElementById("infoButtonText")
 
+const countdownInput = document.getElementById("countdownInput")
+const countdownSaveButton = document.getElementById("countdownSaveButton")
+const countdownSaveIcon = document.getElementById("countdownSaveIcon")
+
 const events = new EventSource("/api/events")
 
 let timer = null
@@ -89,7 +93,24 @@ const updateSettings = () => {
     infoIcon.classList.remove("fa-eye-slash")
     infoIcon.classList.add("fa-eye")
   }
+
+  countdownInput.value = settings.countdown
+  countdownSaveButton.disabled = true
 }
+
+countdownInput.addEventListener("input", e => {
+  countdownSaveButton.disabled = parseInt(e.target.value) == settings.countdown
+})
+
+countdownSaveButton.addEventListener("click", e => {
+  fetch("/api/set_countdown", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ countdown: parseInt(countdownInput.value) })
+  })
+})
 
 events.addEventListener("syncSettings", e => {
   const data = JSON.parse(e.data)

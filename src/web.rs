@@ -1,6 +1,7 @@
 use std::thread::{spawn, JoinHandle};
 use std::sync::{mpsc, Mutex};
 use serde_json::json;
+use serde::Deserialize;
 
 use actix_web::{
     rt,
@@ -66,6 +67,17 @@ async fn disable_debug(data: web::Data<AppState>) -> impl Responder {
     HttpResponse::Ok().body("OK")
 }
 
+#[derive(Deserialize)]
+struct Countdown {
+    countdown: u64,
+}
+
+#[post("api/set_countdown")]
+async fn set_countdown(data: web::Data<AppState>, info: web::Json<Countdown>) -> impl Responder {
+    data.send(InputEvent::SetCountdown(info.countdown));
+    HttpResponse::Ok().body("OK")
+}
+
 #[get("/api/events")]
 async fn events(broadcaster: web::Data<Broadcaster>) -> impl Responder {
     let client = broadcaster.new_client();
@@ -124,6 +136,7 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
             .service(events)
             .service(enable_debug)
             .service(disable_debug)
+            .service(set_countdown)
             .service(fs::Files::new("/", "./static").index_file("index.html"))
     })
     .bind(("0.0.0.0", 8080))?
