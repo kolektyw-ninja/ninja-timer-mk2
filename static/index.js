@@ -71,6 +71,11 @@ events.addEventListener("syncTimers", e => {
   updateButtons()
 })
 
+events.addEventListener("syncSettings", e => {
+  const data = JSON.parse(e.data)
+  console.log(data)
+})
+
 fetch("/api/request_sync", {
   method: "POST",
 })

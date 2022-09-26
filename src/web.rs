@@ -88,6 +88,14 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
 
                     clone.send("syncTimers", &payload.to_string());
                 },
+                OutputEvent::SyncSettings(settings) => {
+                    let payload = json!({
+                        "settings": settings,
+                    });
+
+                    clone.send("syncSettings", &payload.to_string());
+                },
+                #[allow(unreachable_patterns)]
                 _ => clone.send("outputEvent", &format!("{:?}", event))
             };
         }

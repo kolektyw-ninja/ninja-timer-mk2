@@ -1,6 +1,7 @@
 use std::sync::mpsc;
 
 use crate::timer::Timer;
+use crate::settings::Settings;
 
 #[derive(Debug)]
 pub enum InputEvent {
@@ -9,24 +10,35 @@ pub enum InputEvent {
     ResetTimer(usize),
     RequestSync,
     SetButtonState(bool),
+    SetDebug(bool),
+    SetCountdown(u64),
 }
 
 #[derive(Debug, Clone)]
 pub enum OutputEvent {
     SyncTimers(Vec<Timer>),
+    SyncSettings(Settings),
 }
 
 pub struct StateManager {
     listeners: Vec<mpsc::Sender<OutputEvent>>,
     timers: Vec<Timer>,
+    settings: Settings,
 }
 
 impl StateManager {
 
     pub fn new() -> Self {
+        let settings = Settings::load().unwrap_or_else(|_| {
+            let default = Settings::default();
+            default.save().unwrap();
+            default
+        });
+
         Self {
             listeners: vec![],
-            timers: vec![Timer::new(3)],
+            timers: vec![Timer::new(settings.countdown)],
+            settings
         }
     }
 
@@ -56,6 +68,7 @@ impl StateManager {
             },
             InputEvent::RequestSync => {
                 self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+                self.notify_listeners(&OutputEvent::SyncSettings(self.settings.clone()))?;
             },
             InputEvent::SetButtonState(state) => {
                 if state {
@@ -63,6 +76,19 @@ impl StateManager {
                         self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                     }
                 }
+            },
+            InputEvent::SetDebug(debug) => {
+                self.settings.show_debug = debug;
+                self.notify_listeners(&OutputEvent::SyncSettings(self.settings.clone()))?;
+                self.settings.save().unwrap();
+            },
+            InputEvent::SetCountdown(countdown) => {
+                self.settings.countdown = countdown;
+                self.timers = vec![Timer::new(countdown)];
+                self.notify_listeners(&OutputEvent::SyncSettings(self.settings.clone()))?;
+                self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+
+                self.settings.save().unwrap();
             },
             #[allow(unreachable_patterns)]
             _ => return Err(format!("Couldn't process: {:?}", event)),

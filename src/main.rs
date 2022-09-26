@@ -6,6 +6,7 @@ mod web;
 mod broadcast;
 mod gpio;
 mod ip;
+mod settings;
 
 use std::thread;
 use std::sync::mpsc;
