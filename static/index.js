@@ -14,6 +14,10 @@ const countdownSaveIcon = document.getElementById("countdownSaveIcon")
 const deleteBackgroundButton = document.getElementById("deleteBackgroundButton")
 const backgroundInput = document.getElementById("backgroundInput")
 
+const settingsDropdownButton = document.getElementById("settingsDropdownButton")
+const settingsDropdownIcon = document.getElementById("settingsDropdownIcon")
+const settingsContent = document.getElementById("settingsContent")
+
 const events = new EventSource("/api/events")
 
 let timer = null
@@ -128,6 +132,18 @@ backgroundInput.addEventListener("change", e => {
     method: "POST",
     body: data,
   })
+})
+
+settingsDropdownButton.addEventListener("click", _ => {
+  settingsContent.classList.toggle("is-hidden")
+
+  if (settingsDropdownIcon.classList.contains("fa-angle-down")) {
+    settingsDropdownIcon.classList.remove("fa-angle-down")
+    settingsDropdownIcon.classList.add("fa-angle-up")
+  } else {
+    settingsDropdownIcon.classList.remove("fa-angle-up")
+    settingsDropdownIcon.classList.add("fa-angle-down")
+  }
 })
 
 events.addEventListener("syncSettings", e => {
