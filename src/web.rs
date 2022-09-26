@@ -176,7 +176,7 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
             .service(set_countdown)
             .service(delete_background)
             .service(upload_background)
-            .service(fs::Files::new("/", "./static").index_file("index.html"))
+            .service(fs::Files::new("/", "./dist").index_file("index.html"))
     })
     .bind(("0.0.0.0", 8080))?
     .run()
