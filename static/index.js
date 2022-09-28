@@ -129,11 +129,6 @@ settingsDropdownButton.addEventListener("click", _ => {
   }
 })
 
-
-fetch("/api/request_sync", {
-  method: "POST",
-})
-
 start.addEventListener("click", e => {
   e.preventDefault()
   fetch("/api/start_timer", { method: "POST" })
@@ -226,6 +221,10 @@ const setupEvents = () => {
     settings = data.settings
 
     updateSettings()
+  })
+
+  fetch("/api/request_sync", {
+    method: "POST",
   })
 }
 

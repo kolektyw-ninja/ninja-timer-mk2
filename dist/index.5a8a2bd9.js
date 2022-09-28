@@ -101,9 +101,6 @@ settingsDropdownButton.addEventListener("click", (_)=>{
         settingsDropdownIcon.classList.add("fa-angle-down");
     }
 });
-fetch("/api/request_sync", {
-    method: "POST"
-});
 start.addEventListener("click", (e)=>{
     e.preventDefault();
     fetch("/api/start_timer", {
@@ -176,6 +173,9 @@ const setupEvents = ()=>{
         const data = JSON.parse(e.data);
         settings = data.settings;
         updateSettings();
+    });
+    fetch("/api/request_sync", {
+        method: "POST"
     });
 };
 setupEvents();
