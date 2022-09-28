@@ -7,6 +7,15 @@
   <link rel="stylesheet" href="npm:bulma/css/bulma.css">
   <link rel="stylesheet" href="npm:@fortawesome/fontawesome-free/css/all.css">
   <style>
+  @font-face {
+    font-family: Inconsolata;
+    src: url(./Inconsolata-Medium.ttf);
+  }
+
+  #timerDisplay {
+    font-family: Inconsolata;
+  }
+
   .is-pointer {
     cursor: pointer;
   }
@@ -23,7 +32,7 @@
           </p>
         </div>
       </div>
-      <p id="timerDisplay" class="is-size-1" style="font-family: mono">00:00.00<p>
+      <p id="timerDisplay" class="is-size-1">00:00.00<p>
 
       <span class="label">Sterowanie</span>
       <div class="field is-grouped">
