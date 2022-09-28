@@ -15,6 +15,7 @@ pub enum InputEvent {
     SetCountdown(u64),
     ReloadBackground,
     ToggleDisplay,
+    ToggleDebug,
 }
 
 #[derive(Debug, Clone)]
@@ -104,6 +105,11 @@ impl StateManager {
             },
             InputEvent::ToggleDisplay => {
                 self.notify_listeners(&OutputEvent::ToggleDisplay)?;
+            },
+            InputEvent::ToggleDebug => {
+                self.settings.show_debug = !self.settings.show_debug;
+                self.notify_listeners(&OutputEvent::SyncSettings(self.settings.clone()))?;
+                self.settings.save().unwrap();
             },
             #[allow(unreachable_patterns)]
             _ => return Err(format!("Couldn't process: {:?}", event)),
