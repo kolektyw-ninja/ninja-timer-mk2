@@ -131,7 +131,7 @@ impl Display {
 
             if self.should_reload_background {
                 background = if bg_path.is_file() {
-                    Some(texture_creator.load_texture(&bg_path)?)
+                    texture_creator.load_texture(&bg_path).ok()
                 } else {
                     None
                 };
