@@ -4,6 +4,7 @@ mod state;
 mod assets;
 mod web;
 mod broadcast;
+#[cfg(raspi)]
 mod gpio;
 mod info;
 mod settings;
@@ -14,6 +15,7 @@ use std::sync::mpsc;
 use display::Display;
 use state::{StateManager};
 use web::spawn_server;
+#[cfg(raspi)]
 use gpio::spawn_gpio;
 
 pub fn main() -> Result<(), String> {
@@ -26,21 +28,23 @@ pub fn main() -> Result<(), String> {
     let (display_tx, display_rx) = mpsc::channel();
     let mut display = Display::new(display_rx);
     let display_handle = thread::spawn(move || {
-        display.show_windows().unwrap();
     });
 
+    #[cfg(raspi)]
     let _gpio_handle = spawn_gpio(input_tx);
 
-    let mut state_manager = StateManager::new();
-    state_manager.add_listener(display_tx);
-    state_manager.add_listener(output_tx);
+    let _state_handle = thread::spawn(move || {
+        let mut state_manager = StateManager::new();
+        state_manager.add_listener(display_tx);
+        state_manager.add_listener(output_tx);
 
-    state_manager.sync_all().unwrap();
-    for event in input_rx {
-        state_manager.process(event).unwrap();
-    }
+        state_manager.sync_all().unwrap();
+        for event in input_rx {
+            state_manager.process(event).unwrap();
+        }
+    });
 
-    display_handle.join().unwrap();
+    display.show_windows().unwrap();
 
     Ok(())
 }

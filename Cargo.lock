@@ -354,6 +354,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "cfg_aliases"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
+
+[[package]]
 name = "chrono"
 version = "0.4.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -759,6 +765,7 @@ dependencies = [
  "actix-files",
  "actix-multipart",
  "actix-web",
+ "cfg_aliases",
  "chrono",
  "futures-util",
  "parking_lot",
