@@ -40,14 +40,16 @@ const connect = () => {
         let lastPing = Date.now()
 
         source.addEventListener("open", () => {
-            console.log("connected")
+            Api.isConnected = true
+            dispatchEvent("connectionChanged", {})
             keepAliveInternal = setInterval(() => {
                 const timeSincePing = Date.now() - lastPing
                 if (timeSincePing > 11000) {
                     source.close()
                     // noConnectionMessage.classList.remove("is-hidden")
                     // setupEvents()
-                    console.log("missed ping")
+                    Api.isConnected = false
+                    dispatchEvent("connectionChanged", {})
                     clearInterval(keepAliveInternal!)
                     source.close()
                     setTimeout(startEventSource, 1000)
@@ -139,9 +141,12 @@ const connect = () => {
 // }
 }
 
-export default { 
+const Api =  { 
     connect,
     start,
     stop,
     reset,
+    isConnected: false,
 }
+
+export default Api
