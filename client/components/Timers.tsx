@@ -86,7 +86,7 @@ export const Timers = () => {
   return (
     <div className="bg-gray-800 flex flex-col mx-auto items-center max-w-lg rounded-md shadow border border-slate-600">
       <div className="p-5">
-        {timerRefs.map((ref, i) => <p key={i} className="dark:text-gray-300 font-mono p-3 text-5xl" ref={ref} />)}
+        {timerRefs.map((ref, i) => <p key={i} className="dark:text-gray-300 font-mono p-3 text-5xl [&:not(:first-child)]:border-t [&:not(:first-child)]:border-t-slate-600" ref={ref} />)}
         {/* <p className="dark:text-gray-300 font-mono border-t border-t-slate-600 p-3 text-5xl" ref={timerRef2}></p> */}
       </div>
       <div className="inline-flex shadow-sm w-full" role="group">
