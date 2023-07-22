@@ -76,17 +76,17 @@ const Button: React.FC<ButtonProps> = ({ onClick, disabled, children }) => {
 }
 
 export const Timers = () => {
-  const apiTimer = useApiTimer(0)
-  const timerRef1 = useTimerRef(apiTimer)
-
-  const startEnabled = apiTimer && apiTimer.state == "Reset"
-  const stopEnabled = apiTimer && apiTimer.state != "Reset" && apiTimer.state != "Stopped"
-  const resetEnabled = apiTimer && apiTimer.state != "Reset"
+  const apiTimers = [useApiTimer(0), useApiTimer(1)]
+  const timerRefs = apiTimers.map(timer => useTimerRef(timer))
+  console.log(apiTimers)
+  const startEnabled = apiTimers[0] && apiTimers[0].state == "Reset"
+  const stopEnabled = apiTimers[0] && apiTimers[0].state != "Reset" && apiTimers[0].state != "Stopped"
+  const resetEnabled = apiTimers[0] && apiTimers[0].state != "Reset"
 
   return (
     <div className="bg-gray-800 flex flex-col mx-auto items-center max-w-lg rounded-md shadow border border-slate-600">
       <div className="p-5">
-        <p className="dark:text-gray-300 font-mono p-3 text-5xl" ref={timerRef1}></p>
+        {timerRefs.map((ref, i) => <p key={i} className="dark:text-gray-300 font-mono p-3 text-5xl" ref={ref} />)}
         {/* <p className="dark:text-gray-300 font-mono border-t border-t-slate-600 p-3 text-5xl" ref={timerRef2}></p> */}
       </div>
       <div className="inline-flex shadow-sm w-full" role="group">
