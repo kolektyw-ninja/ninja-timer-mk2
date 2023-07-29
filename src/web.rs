@@ -143,14 +143,24 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
             match event {
                 OutputEvent::SyncTimers(timers) => {
                     let payload = json!({
-                        "timers": [{
-                            "id": 0,
-                            "startedAt": timers[0].started_at_datetime.map(|x| x.timestamp_millis()),
-                            "stoppedAt": timers[0].stopped_at_datetime.map(|x| x.timestamp_millis()),
-                            "countdown": timers[0].countdown_duration.as_secs(),
-                            "state": format!("{:?}", timers[0].get_state()),
-                            "formatted": timers[0].format(),
-                        }],
+                        "timers": [
+                            {
+                                "id": 0,
+                                "startedAt": timers[0].started_at_datetime.map(|x| x.timestamp_millis()),
+                                "stoppedAt": timers[0].stopped_at_datetime.map(|x| x.timestamp_millis()),
+                                "countdown": timers[0].countdown_duration.as_secs(),
+                                "state": format!("{:?}", timers[0].get_state()),
+                                "formatted": timers[0].format(),
+                            },
+                            {
+                                "id": 1,
+                                "startedAt": timers[0].started_at_datetime.map(|x| x.timestamp_millis()),
+                                "stoppedAt": timers[0].stopped_at_datetime.map(|x| x.timestamp_millis()),
+                                "countdown": timers[0].countdown_duration.as_secs(),
+                                "state": format!("{:?}", timers[0].get_state()),
+                                "formatted": timers[0].format(),
+                            },
+                        ],
                         "now": Utc::now().timestamp_millis(),
                     });
 

@@ -66,12 +66,14 @@ impl Display {
             eprintln!("Display {}: {:?}", i, bounds);
         }
 
-        let width = display_bounds[0].w as u32;
-        let height = display_bounds[0].h as u32;
+        // let width = display_bounds[0].w as u32;
+        // let height = display_bounds[0].h as u32;
+        let width = 800;
+        let height = 600;
 
         let window = video_subsystem
             .window("ninja-timer", width, height)
-            .fullscreen_desktop()
+            // .fullscreen_desktop()
             .opengl()
             .build()
             .map_err(|e| e.to_string())?;
