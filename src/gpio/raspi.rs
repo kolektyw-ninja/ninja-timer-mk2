@@ -61,7 +61,7 @@ impl Button {
 }
 
 
-pub fn spawn_gpio(sender: Sender<InputEvent>) -> JoinHandle<()> {
+fn spawn_gpio(sender: Sender<InputEvent>) -> JoinHandle<()> {
     spawn(move || {
         let gpio = Gpio::new().unwrap();
 

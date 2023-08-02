@@ -4,7 +4,6 @@ mod state;
 mod assets;
 mod web;
 mod broadcast;
-#[cfg(raspi)]
 mod gpio;
 mod info;
 mod settings;
@@ -15,7 +14,6 @@ use std::sync::mpsc;
 use display::Display;
 use state::{StateManager};
 use web::spawn_server;
-#[cfg(raspi)]
 use gpio::spawn_gpio;
 
 pub fn main() -> Result<(), String> {
@@ -30,7 +28,6 @@ pub fn main() -> Result<(), String> {
     let display_handle = thread::spawn(move || {
     });
 
-    #[cfg(raspi)]
     let _gpio_handle = spawn_gpio(input_tx);
 
     let _state_handle = thread::spawn(move || {
