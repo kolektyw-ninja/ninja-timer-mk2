@@ -43,7 +43,7 @@ const BUTTON_DEBUG: u8 = 9;
 
 pub fn spawn_gpio(sender: Sender<InputEvent>) -> JoinHandle<()> {
     spawn(move || {
-        loop{
+        loop {
             // println!("loop");
             std::thread::sleep(std::time::Duration::from_secs(1));
             // Connect to socket

@@ -1,6 +1,9 @@
 use std::sync::mpsc;
+use std::time::{Instant, Duration};
 
-use crate::timer::Timer;
+use actix_web::cookie::time::Time;
+
+use crate::timer::{Timer, TimerState};
 use crate::settings::Settings;
 use crate::info::Info;
 
@@ -32,6 +35,8 @@ pub struct StateManager {
     timers: Vec<Timer>,
     settings: Settings,
     info: Info,
+    reset_at: Instant,
+    started_at: Instant,
 }
 
 impl StateManager {
@@ -48,6 +53,8 @@ impl StateManager {
             timers: vec![Timer::new(settings.countdown)],
             settings,
             info: Info::get().unwrap(),
+            reset_at: Instant::now(),
+            started_at: Instant::now(),
         }
     }
 
@@ -58,11 +65,21 @@ impl StateManager {
     pub fn process(&mut self, event: InputEvent) -> Result<(), String> {
         match event {
             InputEvent::StartTimer(i) => {
-                if let Err(msg) = self.get_timer_mut(i)?.start() {
-                    eprintln!("Timer {} couldn't be started: {}", i, msg);
-                } else {
+                let is_reset = self.get_timer_mut(i)?.get_state() == TimerState::Reset;
+
+                if is_reset && Instant::now() - self.reset_at > Duration::from_secs(3) {
+                    if let Err(msg) = self.get_timer_mut(i)?.start() {
+                        eprintln!("Timer {} couldn't be started: {}", i, msg);
+                    } else {
+                        self.started_at = Instant::now();
+                        self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
+                    }
+                } else if Instant::now() - self.started_at > Duration::from_secs(5) {
+                    self.get_timer_mut(i)?.reset();
+                    self.reset_at = Instant::now();
                     self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                 }
+
             },
             InputEvent::StopTimer(i) => {
                 if let Err(msg) = self.get_timer_mut(i)?.stop() {
