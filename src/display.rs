@@ -104,6 +104,8 @@ impl Display {
         let mut last_millis = 0;
         let mut last_state = self.timers[0].get_state();
 
+        let mut start_sound_played = false;
+
         'running: loop {
             let frame_start = Instant::now();
 
@@ -215,10 +217,15 @@ impl Display {
                 if millis / 1000 != last_millis / 1000 {
                     beep1.play(1)?;
                 }
-            } else if last_millis < 0 && millis >= 0 {
+            } else if (last_millis < 0 && millis >= 0) || (state == TimerState::Running && !start_sound_played) {
                 beep2.play(1)?;
+                start_sound_played = true;
             } else if last_state == TimerState::Running && state == TimerState::Stopped {
                 buzzer.play_duration(Duration::from_secs(2))?;
+            }
+
+            if state == TimerState::CountingDown || state == TimerState::Stopped || state == TimerState::Reset {
+                start_sound_played = false;
             }
 
             buzzer.update();
