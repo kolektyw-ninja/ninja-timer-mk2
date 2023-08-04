@@ -37,6 +37,10 @@ fn parse_event(event: &str) -> CringeEvt{
     return cevt;
 }
 
+const BUTTON_BUZZER: u8 = 11;
+const BUTTON_START: u8 = 13;
+const BUTTON_DEBUG: u8 = 9;
+
 pub fn spawn_gpio(sender: Sender<InputEvent>) -> JoinHandle<()> {
     spawn(move || {
         loop{
@@ -66,14 +70,19 @@ pub fn spawn_gpio(sender: Sender<InputEvent>) -> JoinHandle<()> {
                                 let evt = parse_event(&my_str);
                                 match evt.event_type {
                                     EvtType::ButtonPress => {
-                                        sender.send(InputEvent::SetButtonState(true)).unwrap();
-                                    }
+                                        match evt.io_bank_num {
+                                            BUTTON_BUZZER => sender.send(InputEvent::SetButtonState(true)).unwrap(),
+                                            BUTTON_DEBUG => sender.send(InputEvent::ToggleDebug).unwrap(),
+                                            BUTTON_START => sender.send(InputEvent::StartTimer(0)).unwrap(),
+                                            x => println!("Unrecognized io_bank_num={x}"),
+                                        }
+                                    },
                                     EvtType::ButtonRelease => {
                                         sender.send(InputEvent::SetButtonState(false)).unwrap();
                                     }
                                 _ => {}
                                 }
-                            }
+                            },
                         }
                     }
                     Err(ref e) if e.kind() == ErrorKind::WouldBlock => {
