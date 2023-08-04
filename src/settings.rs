@@ -5,21 +5,25 @@ use std::path::{Path, PathBuf};
 
 use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
     pub countdown: u64,
     pub show_debug: bool,
+    pub fullscreen: bool,
 }
 
-impl Settings {
-    pub fn default() -> Self {
+impl Default for Settings {
+    fn default() -> Self {
         Settings {
             countdown: 3,
             show_debug: false,
+            fullscreen: true,
         }
     }
+}
 
+impl Settings {
     // load from file
     pub fn load() -> Result<Self> {
         let settings_string = fs::read_to_string(Self::get_path())?;

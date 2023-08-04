@@ -71,12 +71,15 @@ impl Display {
         let width = 800;
         let height = 600;
 
-        let window = video_subsystem
-            .window("ninja-timer", width, height)
-            // .fullscreen_desktop()
-            .opengl()
-            .build()
-            .map_err(|e| e.to_string())?;
+        let mut builder = video_subsystem.window("ninja-timer", width, height);
+
+        builder.opengl();
+
+        if self.settings.unwrap_or_default().fullscreen {
+            builder.fullscreen_desktop();
+        }
+
+        let window = builder.build().map_err(|e| e.to_string())?;
 
         sdl_context.mouse().show_cursor(false);
 
