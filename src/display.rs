@@ -8,7 +8,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect, Point};
 use sdl2::render::{Canvas, TextureQuery, Texture};
-use sdl2::video::Window;
+use sdl2::video::{Window, FullscreenType};
 use sdl2::rwops::RWops;
 use sdl2::mixer::{self, Music};
 
@@ -75,10 +75,6 @@ impl Display {
 
         builder.opengl();
 
-        if self.settings.unwrap_or_default().fullscreen {
-            builder.fullscreen_desktop();
-        }
-
         let window = builder.build().map_err(|e| e.to_string())?;
 
         sdl_context.mouse().show_cursor(false);
@@ -107,6 +103,8 @@ impl Display {
         let mut start_sound_played = false;
 
         'running: loop {
+            self.sync_fullscreen(canvas.window_mut());
+
             let frame_start = Instant::now();
 
             // Processing
@@ -253,6 +251,20 @@ impl Display {
         }
 
         true
+    }
+
+    fn sync_fullscreen(&self, window: &mut Window) {
+        match self.settings {
+            None => return,
+            Some(settings) => {
+                let fullscreen = window.fullscreen_state();
+                if fullscreen == FullscreenType::Off && settings.fullscreen {
+                    window.set_fullscreen(FullscreenType::Desktop).unwrap();
+                } else if fullscreen == FullscreenType::Desktop && !settings.fullscreen {
+                    window.set_fullscreen(FullscreenType::Off).unwrap();
+                }
+            }
+        }
     }
 
     fn handle_messages(&mut self) -> Result<(), String> {

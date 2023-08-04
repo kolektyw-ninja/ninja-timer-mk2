@@ -24,9 +24,6 @@ pub fn main() -> Result<(), String> {
     let _server_handle = spawn_server(input_tx.clone(), output_rx);
 
     let (display_tx, display_rx) = mpsc::channel();
-    let mut display = Display::new(display_rx);
-    let display_handle = thread::spawn(move || {
-    });
 
     let _gpio_handle = spawn_gpio(input_tx);
 
@@ -41,6 +38,7 @@ pub fn main() -> Result<(), String> {
         }
     });
 
+    let mut display = Display::new(display_rx);
     display.show_windows().unwrap();
 
     Ok(())
