@@ -194,7 +194,7 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
             .service(delete_background)
             .service(upload_background)
             .service(toggle_display)
-            .service(fs::Files::new("/", "./dist").index_file("index.html"))
+            .service(fs::Files::new("/", "./client/dist").index_file("index.html"))
     })
     .bind(("0.0.0.0", 8080))?
     .run()
