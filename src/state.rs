@@ -70,7 +70,7 @@ impl StateManager {
             InputEvent::StartTimers => {
                 let is_reset = self.get_timer_mut(0)?.get_state() == TimerState::Reset;
 
-                if is_reset && Instant::now() - self.reset_at > Duration::from_secs(3) {
+                if is_reset && Instant::now() - self.reset_at > Duration::from_secs(1) {
                     for (i, timer) in self.timers.iter_mut().enumerate() {
                         if let Err(msg) = timer.start() {
                             eprintln!("Timer {} couldn't be started: {}", i, msg);
@@ -79,7 +79,7 @@ impl StateManager {
                     }
 
                     self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
-                } else if Instant::now() - self.started_at > Duration::from_secs(5) {
+                } else if Instant::now() - self.started_at > Duration::from_secs(1) {
                     for timer in &mut self.timers {
                         timer.reset();
                         self.reset_at = Instant::now();
