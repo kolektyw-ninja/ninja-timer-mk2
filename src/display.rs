@@ -251,15 +251,15 @@ impl Display {
                     buzzer.play_duration(Duration::from_secs(2))?;
                 }
 
-                if state == TimerState::CountingDown || state == TimerState::Stopped || state == TimerState::Reset {
+                if i == 0 && (state == TimerState::CountingDown || state == TimerState::Stopped || state == TimerState::Reset) {
                     start_sound_played = false;
                 }
-
-                buzzer.update();
 
                 window.last_millis = millis;
                 window.last_state = state;
             }
+
+            buzzer.update();
 
             // Frame padding
             frame_duration = frame_start.elapsed();
