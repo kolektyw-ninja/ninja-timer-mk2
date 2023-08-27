@@ -11,6 +11,7 @@ use crate::info::Info;
 pub enum InputEvent {
     StartTimers,
     StopTimer(usize),
+    StopTimers,
     ResetTimers,
     RequestSync,
     SetButtonState(bool),
@@ -95,6 +96,12 @@ impl StateManager {
                 } else {
                     self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                 }
+            },
+            InputEvent::StopTimers => {
+                for timer in self.timers.iter_mut() {
+                    timer.stop()?;
+                }
+                self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
             },
             InputEvent::ResetTimers => {
                 for timer in &mut self.timers {

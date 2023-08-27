@@ -45,9 +45,16 @@ async fn start_timer(data: web::Data<AppState>) -> impl Responder {
     HttpResponse::Ok().body("OK")
 }
 
-#[post("/api/stop_timer")]
-async fn stop_timer(data: web::Data<AppState>) -> impl Responder {
-    data.send(InputEvent::StopTimer(0));
+#[post("/api/stop_timer/{timer_id}")]
+async fn stop_timer(data: web::Data<AppState>, path: web::Path<usize>) -> impl Responder {
+    let timer_id = path.into_inner();
+    data.send(InputEvent::StopTimer(timer_id));
+    HttpResponse::Ok().body("OK")
+}
+
+#[post("/api/stop_timers")]
+async fn stop_timers(data: web::Data<AppState>) -> impl Responder {
+    data.send(InputEvent::StopTimers);
     HttpResponse::Ok().body("OK")
 }
 
