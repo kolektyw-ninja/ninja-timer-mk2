@@ -1,3 +1,4 @@
+use std::borrow::BorrowMut;
 use std::time::{Duration, Instant};
 use std::sync::mpsc::{self, TryRecvError};
 
@@ -7,8 +8,8 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect, Point};
-use sdl2::render::{Canvas, TextureQuery, Texture};
-use sdl2::video::{Window, FullscreenType};
+use sdl2::render::{Canvas, TextureQuery, Texture, TextureCreator};
+use sdl2::video::{Window, FullscreenType, WindowContext};
 use sdl2::rwops::RWops;
 use sdl2::mixer::{self, Music};
 
@@ -24,22 +25,27 @@ pub struct Display {
     settings: Option<Settings>,
     info: Option<Info>,
     should_reload_background: bool,
-    is_shown: bool,
-    should_toggle_visibility: bool,
+    is_visible: bool,
 }
 
 const TARGET_FRAME_DURATION: Duration = Duration::from_millis(1000 / 30);
+
+struct WindowData {
+    canvas: Canvas<Window>,
+    texture_creator: TextureCreator<WindowContext>,
+    last_millis: i128,
+    last_state: TimerState,
+}
 
 impl Display {
     pub fn new(receiver: mpsc::Receiver<OutputEvent>) -> Self {
         Self {
             receiver,
-            timers: vec![Timer::new(0)],
+            timers: vec![],
             settings: None,
             info: None,
             should_reload_background: true,
-            is_shown: true,
-            should_toggle_visibility: false,
+            is_visible: true,
         }
     }
 
@@ -71,40 +77,43 @@ impl Display {
         let width = 800;
         let height = 600;
 
-        let mut builder = video_subsystem.window("ninja-timer", width, height);
-
-        builder.opengl();
-
-        let window = builder.build().map_err(|e| e.to_string())?;
-
         sdl_context.mouse().show_cursor(false);
 
         let mut font = ResizeableFont::load_from_bytes(&ttf_context, assets::FONT, 64)?;
         let debug_font = ResizeableFont::load_from_bytes(&ttf_context, assets::FONT, 20)?;
 
-        let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
-        let texture_creator = canvas.texture_creator();
+        let mut builder = video_subsystem.window("ninja-timer", width, height);
+
+        builder.opengl();
+        
+        let mut windows = vec![];
+        
+        for i in 0..2 {
+            let window = builder.build().map_err(|e| e.to_string())?;
+
+            let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
+            let texture_creator = canvas.texture_creator();
+
+            canvas.set_draw_color(Color::RGB(0, 0, 0));
+            canvas.clear();
+            canvas.present();
+
+            windows.push(WindowData{ 
+                canvas, 
+                texture_creator,
+                last_millis: 0,
+                last_state: TimerState::Reset,
+            });
+        }
 
         let bg_path = get_background_path();
-
-        let mut background: Option<Texture> = None;
-
-        //canvas.copy(&background, None, None)?;
-        canvas.set_draw_color(Color::RGB(0, 0, 0));
-        canvas.clear();
-        canvas.present();
 
         let mut event_pump = sdl_context.event_pump()?;
 
         let mut frame_duration: Duration = TARGET_FRAME_DURATION;
-        let mut last_millis = 0;
-        let mut last_state = self.timers[0].get_state();
-
         let mut start_sound_played = false;
 
         'running: loop {
-            self.sync_fullscreen(canvas.window_mut());
-
             let frame_start = Instant::now();
 
             // Processing
@@ -121,115 +130,136 @@ impl Display {
 
             self.handle_messages()?;
 
-            if self.should_toggle_visibility {
-                if self.is_shown {
-                    println!("Hiding display");
-                    canvas.window_mut().hide();
+            let mut backgrounds = vec![None, None];
+
+            for (i, window) in windows.iter_mut().enumerate() {
+                let window_enabled = i < self.timers.len();
+                self.sync_fullscreen(window.canvas.window_mut());
+
+                if self.is_visible && window_enabled {
+                    window.canvas.window_mut().show();
                 } else {
-                    println!("Showing display");
-                    canvas.window_mut().show();
+                    window.canvas.window_mut().hide();
                 }
 
-                self.is_shown = !self.is_shown;
-                self.should_toggle_visibility = false;
-            }
+                // if self.should_toggle_visibility {
+                //     if self.is_shown {
+                //         println!("Hiding display");
+                //         window.canvas.window_mut().hide();
+                //     } else {
+                //         println!("Showing display");
+                //         window.canvas.window_mut().show();
+                //     }
 
-            if self.should_reload_background {
-                background = if bg_path.is_file() {
-                    texture_creator.load_texture(&bg_path).ok()
-                } else {
-                    None
-                };
+                //     self.is_shown = !self.is_shown;
+                //     self.should_toggle_visibility = false;
+                // }
 
-                self.should_reload_background = false;
-            }
+                if self.should_reload_background {
+                    backgrounds[i] = if bg_path.is_file() {
+                        window.texture_creator.load_texture(&bg_path).ok()
+                    } else {
+                        None
+                    };
 
-            // Drawing
-            let viewport = canvas.viewport();
-            let width = viewport.width();
-            let height = viewport.height();
-
-            let timer = self.timers[0];
-            font.set_size(height as u16 / 3);
-
-            canvas.set_draw_color(Color::RGB(0, 0, 0));
-            canvas.clear();
-
-            if let Some(ref bg) = background {
-                canvas.copy(bg, None, None)?;
-            }
-
-            let color = match timer.get_state() {
-                TimerState::CountingDown => Color::RGB(255, 0, 0),
-                TimerState::Stopped => Color::RGB(0, 255, 0),
-                _ => Color::RGB(255, 255, 255),
-            };
-
-            render_text(
-                &timer.format(),
-                &Point::new(width as i32 / 2, height as i32 / 2),
-                &font.inner,
-                &mut canvas,
-                &color,
-                Align::Center,
-            )?;
-
-            // Debug
-            if self.debug_enabled() {
-                let ips = if let Some(ref info) = self.info {
-                    info.ips.clone()
-                } else {
-                    vec![]
-                };
-
-                canvas.set_draw_color(Color::RGB(255, 255, 255));
-                canvas.fill_rect(Rect::new(0, 0, width, 200))?;
-
-                render_text(
-                    &format!("IP: {}", ips.join(", ")),
-                    &Point::new(10, 10),
-                    &debug_font.inner,
-                    &mut canvas,
-                    &Color::RGB(0, 0, 0),
-                    Align::TopLeft,
-                )?;
-
-                render_text(
-                    &format!("FPS: {:.02}", 1000/frame_duration.as_millis()),
-                    &Point::new(10, 30),
-                    &debug_font.inner,
-                    &mut canvas,
-                    &Color::RGB(0, 0, 0),
-                    Align::TopLeft,
-                )?;
-
-            }
-
-            canvas.present();
-
-            // Audio
-            let millis = timer.as_millis();
-
-            let state = timer.get_state();
-            if state == TimerState::CountingDown {
-                if millis / 1000 != last_millis / 1000 {
-                    beep1.play(1)?;
+                    if i == self.timers.len() - 1 {
+                        self.should_reload_background = false;
+                    }
                 }
-            } else if (last_millis < 0 && millis >= 0) || (state == TimerState::Running && !start_sound_played) {
-                beep2.play(1)?;
-                start_sound_played = true;
-            } else if last_state == TimerState::Running && state == TimerState::Stopped {
-                buzzer.play_duration(Duration::from_secs(2))?;
+
+                if i > self.timers.len() - 1 {
+                    continue;
+                }
+
+                // Drawing
+                let viewport = window.canvas.viewport();
+                let width = viewport.width();
+                let height = viewport.height();
+
+                let timer = self.timers[i];
+                font.set_size(height as u16 / 3);
+
+                window.canvas.set_draw_color(Color::RGB(0, 0, 0));
+                window.canvas.clear();
+
+                if let Some(ref bg) = backgrounds[i] {
+                    window.canvas.copy(bg, None, None)?;
+                }
+
+                let color = match timer.get_state() {
+                    TimerState::CountingDown => Color::RGB(255, 0, 0),
+                    TimerState::Stopped => Color::RGB(0, 255, 0),
+                    _ => Color::RGB(255, 255, 255),
+                };
+
+                render_text(
+                    &timer.format(),
+                    &Point::new(width as i32 / 2, height as i32 / 2),
+                    &font.inner,
+                    &mut window.canvas,
+                    &color,
+                    Align::Center,
+                )?;
+
+                // Debug
+                if self.debug_enabled() {
+                    let ips = if let Some(ref info) = self.info {
+                        info.ips.clone()
+                    } else {
+                        vec![]
+                    };
+
+                    window.canvas.set_draw_color(Color::RGB(255, 255, 255));
+                    window.canvas.fill_rect(Rect::new(0, 0, width, 200))?;
+
+                    render_text(
+                        &format!("IP: {}", ips.join(", ")),
+                        &Point::new(10, 10),
+                        &debug_font.inner,
+                        &mut window.canvas,
+                        &Color::RGB(0, 0, 0),
+                        Align::TopLeft,
+                    )?;
+
+                    render_text(
+                        &format!("FPS: {:.02}", 1000/frame_duration.as_millis()),
+                        &Point::new(10, 30),
+                        &debug_font.inner,
+                        &mut window.canvas,
+                        &Color::RGB(0, 0, 0),
+                        Align::TopLeft,
+                    )?;
+
+                }
+
+                window.canvas.present();
+
+                // Audio
+                let millis = timer.as_millis();
+
+                let state = timer.get_state();
+                if state == TimerState::CountingDown {
+                    if i == 0 && millis / 1000 != window.last_millis / 1000 {
+                        beep1.play(1)?;
+                    }
+                } else if (window.last_millis < 0 && millis >= 0) || (state == TimerState::Running && !start_sound_played) {
+                    if i == 0 {
+                        beep2.play(1)?;
+                        start_sound_played = true;
+                    }
+                } else if window.last_state == TimerState::Running && state == TimerState::Stopped {
+                    buzzer.play_duration(Duration::from_secs(2))?;
+                }
+
+                if state == TimerState::CountingDown || state == TimerState::Stopped || state == TimerState::Reset {
+                    start_sound_played = false;
+                }
+
+                buzzer.update();
+
+                window.last_millis = millis;
+                window.last_state = state;
             }
-
-            if state == TimerState::CountingDown || state == TimerState::Stopped || state == TimerState::Reset {
-                start_sound_played = false;
-            }
-
-            buzzer.update();
-
-            last_millis = millis;
-            last_state = state;
 
             // Frame padding
             frame_duration = frame_start.elapsed();
@@ -278,7 +308,7 @@ impl Display {
                     OutputEvent::SyncSettings(settings) => self.settings = Some(settings),
                     OutputEvent::SyncInfo(info) => self.info = Some(info),
                     OutputEvent::ReloadBackground => self.should_reload_background = true,
-                    OutputEvent::ToggleDisplay => self.should_toggle_visibility = true,
+                    OutputEvent::SetDisplay(x) => self.is_visible = x,
                     #[allow(unreachable_patterns)]
                     _ => (),
                 },

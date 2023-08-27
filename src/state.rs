@@ -27,7 +27,7 @@ pub enum OutputEvent {
     SyncSettings(Settings),
     SyncInfo(Info),
     ReloadBackground,
-    ToggleDisplay,
+    SetDisplay(bool),
 }
 
 pub struct StateManager {
@@ -37,6 +37,7 @@ pub struct StateManager {
     info: Info,
     reset_at: Instant,
     started_at: Instant,
+    display_visible: bool,
 }
 
 impl StateManager {
@@ -50,11 +51,12 @@ impl StateManager {
 
         Self {
             listeners: vec![],
-            timers: vec![Timer::new(settings.countdown)],
+            timers: vec![Timer::new(settings.countdown), Timer::new(settings.countdown)],
             settings,
             info: Info::get().unwrap(),
             reset_at: Instant::now(),
             started_at: Instant::now(),
+            display_visible: true,
         }
     }
 
@@ -120,7 +122,7 @@ impl StateManager {
             },
             InputEvent::SetCountdown(countdown) => {
                 self.settings.countdown = countdown;
-                self.timers = vec![Timer::new(countdown)];
+                self.timers = vec![Timer::new(countdown), Timer::new(countdown)];
                 self.notify_listeners(&OutputEvent::SyncSettings(self.settings.clone()))?;
                 self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
 
@@ -130,7 +132,8 @@ impl StateManager {
                 self.notify_listeners(&OutputEvent::ReloadBackground)?;
             },
             InputEvent::ToggleDisplay => {
-                self.notify_listeners(&OutputEvent::ToggleDisplay)?;
+                self.display_visible = !self.display_visible;
+                self.notify_listeners(&OutputEvent::SetDisplay(self.display_visible))?;
             },
             InputEvent::ToggleDebug => {
                 self.settings.show_debug = !self.settings.show_debug;
