@@ -372,6 +372,10 @@ img, video {
   inset-inline-end: .25rem;
 }
 
+.end-2 {
+  inset-inline-end: .5rem;
+}
+
 .isolate {
   isolation: isolate;
 }
@@ -406,6 +410,10 @@ img, video {
 
 .clear-none {
   clear: none;
+}
+
+.m-1 {
+  margin: .25rem;
 }
 
 .m-4 {

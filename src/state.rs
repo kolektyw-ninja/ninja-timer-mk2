@@ -9,9 +9,9 @@ use crate::info::Info;
 
 #[derive(Debug)]
 pub enum InputEvent {
-    StartTimer(usize),
+    StartTimers,
     StopTimer(usize),
-    ResetTimer(usize),
+    ResetTimers,
     RequestSync,
     SetButtonState(bool),
     SetDebug(bool),
@@ -64,18 +64,24 @@ impl StateManager {
 
     pub fn process(&mut self, event: InputEvent) -> Result<(), String> {
         match event {
-            InputEvent::StartTimer(i) => {
-                let is_reset = self.get_timer_mut(i)?.get_state() == TimerState::Reset;
+            InputEvent::StartTimers => {
+                let is_reset = self.get_timer_mut(0)?.get_state() == TimerState::Reset;
 
                 if is_reset && Instant::now() - self.reset_at > Duration::from_secs(3) {
-                    if let Err(msg) = self.get_timer_mut(i)?.start() {
-                        eprintln!("Timer {} couldn't be started: {}", i, msg);
-                    } else {
+                    for (i, timer) in self.timers.iter_mut().enumerate() {
+                        if let Err(msg) = timer.start() {
+                            eprintln!("Timer {} couldn't be started: {}", i, msg);
+                        }
                         self.started_at = Instant::now();
-                        self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                     }
+
+                    self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                 } else if Instant::now() - self.started_at > Duration::from_secs(5) {
-                    self.get_timer_mut(i)?.reset();
+                    for timer in &mut self.timers {
+                        timer.reset();
+                        self.reset_at = Instant::now();
+                    }
+                    
                     self.reset_at = Instant::now();
                     self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                 }
@@ -88,8 +94,11 @@ impl StateManager {
                     self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                 }
             },
-            InputEvent::ResetTimer(i) => {
-                self.get_timer_mut(i)?.reset();
+            InputEvent::ResetTimers => {
+                for timer in &mut self.timers {
+                    timer.reset();
+                }
+                
                 self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
             },
             InputEvent::RequestSync => {

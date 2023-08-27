@@ -73,7 +73,7 @@ pub fn spawn_gpio(sender: Sender<InputEvent>) -> JoinHandle<()> {
                                         match evt.io_bank_num {
                                             BUTTON_BUZZER => sender.send(InputEvent::SetButtonState(true)).unwrap(),
                                             BUTTON_DEBUG => sender.send(InputEvent::ToggleDebug).unwrap(),
-                                            BUTTON_START => sender.send(InputEvent::StartTimer(0)).unwrap(),
+                                            BUTTON_START => sender.send(InputEvent::StartTimers).unwrap(),
                                             x => println!("Unrecognized io_bank_num={x}"),
                                         }
                                     },

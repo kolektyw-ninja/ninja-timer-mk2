@@ -76,7 +76,7 @@ const Button: React.FC<ButtonProps> = ({ onClick, disabled, children }) => {
 }
 
 export const Timers = () => {
-  const apiTimers = [useApiTimer(0), useApiTimer(1)]
+  const apiTimers = [useApiTimer(0)]
   const timerRefs = apiTimers.map(timer => useTimerRef(timer))
   console.log(apiTimers)
   const startEnabled = apiTimers[0] && apiTimers[0].state == "Reset"

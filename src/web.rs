@@ -41,7 +41,7 @@ impl AppState {
 
 #[post("/api/start_timer")]
 async fn start_timer(data: web::Data<AppState>) -> impl Responder {
-    data.send(InputEvent::StartTimer(0));
+    data.send(InputEvent::StartTimers);
     HttpResponse::Ok().body("OK")
 }
 
@@ -53,7 +53,7 @@ async fn stop_timer(data: web::Data<AppState>) -> impl Responder {
 
 #[post("/api/reset_timer")]
 async fn reset_timer(data: web::Data<AppState>) -> impl Responder {
-    data.send(InputEvent::ResetTimer(0));
+    data.send(InputEvent::ResetTimers);
     HttpResponse::Ok().body("OK")
 }
 
@@ -142,25 +142,17 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
         for event in receiver {
             match event {
                 OutputEvent::SyncTimers(timers) => {
+                    let timer_objects: Vec<_> = timers.iter().enumerate().map(|(i, timer)| json!({
+                        "id": i,
+                        "startedAt": timer.started_at_datetime.map(|x| x.timestamp_millis()),
+                        "stoppedAt": timer.stopped_at_datetime.map(|x| x.timestamp_millis()),
+                        "countdown": timer.countdown_duration.as_secs(),
+                        "state": format!("{:?}", timer.get_state()),
+                        "formatted": timer.format(),
+                    })).collect();
+
                     let payload = json!({
-                        "timers": [
-                            {
-                                "id": 0,
-                                "startedAt": timers[0].started_at_datetime.map(|x| x.timestamp_millis()),
-                                "stoppedAt": timers[0].stopped_at_datetime.map(|x| x.timestamp_millis()),
-                                "countdown": timers[0].countdown_duration.as_secs(),
-                                "state": format!("{:?}", timers[0].get_state()),
-                                "formatted": timers[0].format(),
-                            },
-                            {
-                                "id": 1,
-                                "startedAt": timers[0].started_at_datetime.map(|x| x.timestamp_millis()),
-                                "stoppedAt": timers[0].stopped_at_datetime.map(|x| x.timestamp_millis()),
-                                "countdown": timers[0].countdown_duration.as_secs(),
-                                "state": format!("{:?}", timers[0].get_state()),
-                                "formatted": timers[0].format(),
-                            },
-                        ],
+                        "timers": timer_objects,
                         "now": Utc::now().timestamp_millis(),
                     });
 
