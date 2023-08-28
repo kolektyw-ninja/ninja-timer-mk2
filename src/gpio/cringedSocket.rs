@@ -38,7 +38,7 @@ fn parse_event(event: &str) -> CringeEvt{
 }
 
 pub (crate) const BUTTON_1: u8 = 1;
-pub (crate) const BUTTON_2: u8 = 1;
+pub (crate) const BUTTON_2: u8 = 2;
 
 const BUTTON_DEBUG: u8 = 9;
 

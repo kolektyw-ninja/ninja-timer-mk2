@@ -18,6 +18,7 @@ use gpio::spawn_gpio;
 
 pub fn main() -> Result<(), String> {
     wait_for_network();
+    std::thread::sleep(std::time::Duration::from_secs(5));
 
     let (input_tx, input_rx) = mpsc::channel();
     let (output_tx, output_rx) = mpsc::channel();
