@@ -319,14 +319,12 @@ impl Display {
                 };
 
                 if !window_data.is_fullscreen && settings.fullscreen {
-                    sdl_window.set_bordered(false);
                     sdl_window.set_position(sdl2::video::WindowPos::Positioned(x.into()), sdl2::video::WindowPos::Positioned(y.into()));
-                    let (width, height) = window_data.max_size;
-                    sdl_window.set_size(width, height);
+                    sdl_window.set_fullscreen(FullscreenType::Desktop).unwrap();
                     // window.transform(wmctrl::Transformation { gravity: 0, x, y, width: 800, height: 600 });
                     // window.change_state(wmctrl::State::new(wmctrl::Action::Add, wmctrl::Property::Fullscreen));
                 } else if window_data.is_fullscreen && !settings.fullscreen {
-                    sdl_window.set_bordered(true);
+                    sdl_window.set_fullscreen(FullscreenType::Off).unwrap();
                     // window.change_state(wmctrl::State::new(wmctrl::Action::Remove, wmctrl::Property::Fullscreen));
                 }
             }
