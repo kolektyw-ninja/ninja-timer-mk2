@@ -37,8 +37,9 @@ fn parse_event(event: &str) -> CringeEvt{
     return cevt;
 }
 
-const BUTTON_BUZZER: u8 = 11;
-const BUTTON_START: u8 = 13;
+pub (crate) const BUTTON_1: u8 = 1;
+pub (crate) const BUTTON_2: u8 = 1;
+
 const BUTTON_DEBUG: u8 = 9;
 
 pub fn spawn_gpio(sender: Sender<InputEvent>) -> JoinHandle<()> {
@@ -71,15 +72,13 @@ pub fn spawn_gpio(sender: Sender<InputEvent>) -> JoinHandle<()> {
                                 match evt.event_type {
                                     EvtType::ButtonPress => {
                                         match evt.io_bank_num {
-                                            BUTTON_BUZZER => sender.send(InputEvent::SetButtonState(true)).unwrap(),
-                                            BUTTON_DEBUG => sender.send(InputEvent::ToggleDebug).unwrap(),
-                                            BUTTON_START => sender.send(InputEvent::StartTimers).unwrap(),
+                                            BUTTON_1 | BUTTON_2 | BUTTON_DEBUG => sender.send(InputEvent::SetButtonState(evt.io_bank_num, true)).unwrap(),
                                             x => println!("Unrecognized io_bank_num={x}"),
                                         }
                                     },
                                     EvtType::ButtonRelease => {
                                         match evt.io_bank_num {
-                                            BUTTON_DEBUG => sender.send(InputEvent::ToggleDebug).unwrap(),
+                                            BUTTON_1 | BUTTON_2 | BUTTON_DEBUG => sender.send(InputEvent::SetButtonState(evt.io_bank_num, false)).unwrap(),
                                             x => println!("Unrecognized io_bank_num={x}"),
                                         }
                                     }

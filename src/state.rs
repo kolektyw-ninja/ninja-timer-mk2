@@ -14,7 +14,7 @@ pub enum InputEvent {
     StopTimers,
     ResetTimers,
     RequestSync,
-    SetButtonState(bool),
+    SetButtonState(u8, bool),
     SetDebug(bool),
     SetCountdown(u64),
     ReloadBackground,
@@ -115,9 +115,9 @@ impl StateManager {
                 self.notify_listeners(&OutputEvent::SyncSettings(self.settings.clone()))?;
                 self.notify_listeners(&OutputEvent::SyncInfo(self.info.clone()))?;
             },
-            InputEvent::SetButtonState(state) => {
-                if state {
-                    if let Ok(_) = self.get_timer_mut(0)?.stop() {
+            InputEvent::SetButtonState(button_id, pressed) => {
+                if pressed && (button_id == 1 || button_id == 2) {
+                    if self.get_timer_mut((button_id - 1).into())?.stop().is_ok() {
                         self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                     }
                 }
