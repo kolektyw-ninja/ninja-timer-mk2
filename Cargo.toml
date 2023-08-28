@@ -15,6 +15,7 @@ tokio = "*"
 chrono = "*"
 serde_json = "*"
 serde = { version ="*", features = ["derive"] }
+wmctrl = "0.1.8"
 
 [dependencies.sdl2]
 version = "0.35"
