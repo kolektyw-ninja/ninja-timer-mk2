@@ -62742,7 +62742,7 @@ const start = ()=>{
     post("/api/start_timer");
 };
 const stop = ()=>{
-    post("/api/stop_timer");
+    post("/api/stop_timers");
 };
 const reset = ()=>{
     post("/api/reset_timer");

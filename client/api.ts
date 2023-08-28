@@ -7,7 +7,7 @@ const start = () => {
 }
 
 const stop = () => {
-    post("/api/stop_timer")
+    post("/api/stop_timers")
 }
 
 const reset = () => {
