@@ -27329,10 +27329,10 @@ var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
 var _classnames = require("classnames");
 var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _navbar = require("./Navbar");
 var _timers = require("./Timers");
 var _notifications = require("./Notifications");
 var _notificationsDefault = parcelHelpers.interopDefault(_notifications);
+var _settings = require("./Settings");
 var _s = $RefreshSig$();
 const App = ()=>{
     _s();
@@ -27346,38 +27346,35 @@ const App = ()=>{
             children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
                 className: "container mx-auto",
                 children: [
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _navbar.Navbar), {
-                        darkMode: isDark,
-                        setDarkMode: setIsDark
-                    }, void 0, false, {
-                        fileName: "components/App.tsx",
-                        lineNumber: 14,
-                        columnNumber: 11
-                    }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _notificationsDefault.default), {}, void 0, false, {
                         fileName: "components/App.tsx",
-                        lineNumber: 15,
+                        lineNumber: 16,
                         columnNumber: 11
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _timers.Timers), {}, void 0, false, {
                         fileName: "components/App.tsx",
-                        lineNumber: 16,
+                        lineNumber: 17,
+                        columnNumber: 11
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _settings.Settings), {}, void 0, false, {
+                        fileName: "components/App.tsx",
+                        lineNumber: 18,
                         columnNumber: 11
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "components/App.tsx",
-                lineNumber: 13,
+                lineNumber: 14,
                 columnNumber: 9
             }, undefined)
         }, void 0, false, {
             fileName: "components/App.tsx",
-            lineNumber: 12,
+            lineNumber: 13,
             columnNumber: 7
         }, undefined)
     }, void 0, false, {
         fileName: "components/App.tsx",
-        lineNumber: 11,
+        lineNumber: 12,
         columnNumber: 5
     }, undefined);
 };
@@ -27391,7 +27388,7 @@ $RefreshReg$(_c, "App");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","classnames":"jocGM","./Navbar":"lvhyb","./Timers":"iryIt","./Notifications":"4Zy42","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"jocGM":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","classnames":"jocGM","./Timers":"iryIt","./Notifications":"4Zy42","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","./Settings":"amg3j"}],"jocGM":[function(require,module,exports) {
 /*!
 	Copyright (c) 2018 Jed Watson.
 	Licensed under the MIT License (MIT), see
@@ -27432,58 +27429,227 @@ $RefreshReg$(_c, "App");
     else window.classNames = classNames;
 })();
 
-},{}],"lvhyb":[function(require,module,exports) {
-var $parcel$ReactRefreshHelpers$9495 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+},{}],"iryIt":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$ea70 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
-$parcel$ReactRefreshHelpers$9495.prelude(module);
+$parcel$ReactRefreshHelpers$ea70.prelude(module);
 
 try {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Navbar", ()=>Navbar);
+parcelHelpers.export(exports, "formatTime", ()=>formatTime);
+parcelHelpers.export(exports, "Timers", ()=>Timers);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
 var _fa6 = require("react-icons/fa6");
-const Navbar = ({ darkMode, setDarkMode })=>{
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("nav", {
-        className: "w-full p-4 bg-slate-700 mb-4 rounded-b-md font-medium text-gray-400",
-        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("ul", {
-            className: "",
-            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("li", {
-                className: "flex flex-row justify-between items-center",
-                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaGear), {}, void 0, false, {
-                    fileName: "components/Navbar.tsx",
-                    lineNumber: 10,
-                    columnNumber: 11
-                }, undefined)
-            }, void 0, false, {
-                fileName: "components/Navbar.tsx",
-                lineNumber: 9,
-                columnNumber: 9
-            }, undefined)
-        }, void 0, false, {
-            fileName: "components/Navbar.tsx",
-            lineNumber: 8,
-            columnNumber: 7
-        }, undefined)
+var _api = require("../api");
+var _apiDefault = parcelHelpers.interopDefault(_api);
+var _s = $RefreshSig$(), _s1 = $RefreshSig$(), _s2 = $RefreshSig$();
+const timeElapsed = (timer)=>timer.startedAt == null ? null : Date.now() - timer.startedAt - timer.countdown * 1000;
+const useTimerRef = (timer)=>{
+    _s();
+    const timerRef = (0, _react.useRef)();
+    const requestRef = (0, _react.useRef)();
+    const animate = (0, _react.useCallback)(()=>{
+        if (timer == null || timer.startedAt == null) return;
+        timerRef.current.innerHTML = formatTime(timeElapsed(timer));
+        requestRef.current = requestAnimationFrame(animate);
+    }, [
+        timer
+    ]);
+    (0, _react.useEffect)(()=>{
+        if (timer == null || timer.startedAt == null) timerRef.current.innerHTML = formatTime(0);
+        else if (timer.state == "Stopped") timerRef.current.innerHTML = timer.formatted;
+        else {
+            requestRef.current = requestAnimationFrame(animate);
+            return ()=>cancelAnimationFrame(requestRef.current);
+        }
+    }, [
+        timer
+    ]);
+    return timerRef;
+};
+_s(useTimerRef, "qst3dOXPOH8zWdBvNtFkiwrncvE=");
+const useApiTimers = ()=>{
+    _s1();
+    const [timers, setTimers] = (0, _react.useState)([
+        null
+    ]);
+    const updateTimers = (0, _react.useCallback)((e)=>{
+        const timers = e.detail;
+        setTimers(timers);
+    }, [
+        setTimers
+    ]);
+    (0, _react.useEffect)(()=>{
+        window.addEventListener("timerUpdate", updateTimers);
+        return ()=>window.removeEventListener("timerUpdate", updateTimers);
+    }, [
+        updateTimers
+    ]);
+    return timers;
+};
+_s1(useApiTimers, "fUl7p5QtGRHQr3g4Z1rL+x2nmMc=");
+const formatTime = (milis)=>{
+    if (milis < 0) {
+        const countdown = Math.ceil(Math.abs(milis) / 1000);
+        return `${countdown}`;
+    }
+    const minutes = Math.floor(milis / 1000 / 60);
+    const seconds = Math.floor(milis % 60000 / 1000);
+    const hundredths = Math.floor(milis % 1000 / 10);
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${hundredths.toString().padStart(2, "0")}`;
+};
+const Button = ({ onClick, disabled, children })=>{
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+        onClick: onClick,
+        disabled: disabled,
+        className: "px-4 py-2 text-sm inline-flex flex-grow justify-center items-center font-medium disabled:cursor-not-allowed text-gray-900 bg-white border border-gray-200 first-child:rounded-l-md last-child:rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:rbng-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 disabled:dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:enabled:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white",
+        children: children
     }, void 0, false, {
-        fileName: "components/Navbar.tsx",
-        lineNumber: 7,
+        fileName: "components/Timers.tsx",
+        lineNumber: 69,
         columnNumber: 5
     }, undefined);
 };
-_c = Navbar;
-var _c;
-$RefreshReg$(_c, "Navbar");
+_c = Button;
+const Timers = ()=>{
+    _s2();
+    var _s = $RefreshSig$();
+    const apiTimers = useApiTimers();
+    const timerRefs = apiTimers.map(_s((timer)=>{
+        _s();
+        return useTimerRef(timer);
+    }, "9HNiyo0IDuvUjBiuQzNBN1Qv9bc=", false, function() {
+        return [
+            useTimerRef
+        ];
+    }));
+    const startEnabled = apiTimers[0] && apiTimers[0].state == "Reset";
+    const stopEnabled = apiTimers[0] && apiTimers[0].state != "Reset" && apiTimers[0].state != "Stopped";
+    const resetEnabled = apiTimers[0] && apiTimers[0].state != "Reset";
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+        className: "bg-gray-800 flex flex-col mx-auto items-center max-w-lg rounded-md shadow border border-slate-600",
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                className: "p-5",
+                children: timerRefs.map((ref, i)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
+                        className: "dark:text-gray-300 font-mono p-3 text-5xl [&:not(:first-child)]:border-t [&:not(:first-child)]:border-t-slate-600",
+                        ref: ref
+                    }, i, false, {
+                        fileName: "components/Timers.tsx",
+                        lineNumber: 85,
+                        columnNumber: 36
+                    }, undefined))
+            }, void 0, false, {
+                fileName: "components/Timers.tsx",
+                lineNumber: 84,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                className: "inline-flex shadow-sm w-full",
+                role: "group",
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(Button, {
+                        onClick: (0, _apiDefault.default).start,
+                        disabled: !startEnabled,
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaPlay), {}, void 0, false, {
+                                fileName: "components/Timers.tsx",
+                                lineNumber: 90,
+                                columnNumber: 11
+                            }, undefined),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                className: "ml-2",
+                                children: "Start"
+                            }, void 0, false, {
+                                fileName: "components/Timers.tsx",
+                                lineNumber: 91,
+                                columnNumber: 11
+                            }, undefined)
+                        ]
+                    }, void 0, true, {
+                        fileName: "components/Timers.tsx",
+                        lineNumber: 89,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(Button, {
+                        onClick: (0, _apiDefault.default).stop,
+                        disabled: !stopEnabled,
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaStop), {}, void 0, false, {
+                                fileName: "components/Timers.tsx",
+                                lineNumber: 94,
+                                columnNumber: 11
+                            }, undefined),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                className: "ml-2",
+                                children: "Stop"
+                            }, void 0, false, {
+                                fileName: "components/Timers.tsx",
+                                lineNumber: 95,
+                                columnNumber: 11
+                            }, undefined)
+                        ]
+                    }, void 0, true, {
+                        fileName: "components/Timers.tsx",
+                        lineNumber: 93,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(Button, {
+                        onClick: (0, _apiDefault.default).reset,
+                        disabled: !resetEnabled,
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaArrowRotateLeft), {}, void 0, false, {
+                                fileName: "components/Timers.tsx",
+                                lineNumber: 98,
+                                columnNumber: 11
+                            }, undefined),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                className: "ml-2",
+                                children: "Reset"
+                            }, void 0, false, {
+                                fileName: "components/Timers.tsx",
+                                lineNumber: 99,
+                                columnNumber: 11
+                            }, undefined)
+                        ]
+                    }, void 0, true, {
+                        fileName: "components/Timers.tsx",
+                        lineNumber: 97,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "components/Timers.tsx",
+                lineNumber: 88,
+                columnNumber: 7
+            }, undefined)
+        ]
+    }, void 0, true, {
+        fileName: "components/Timers.tsx",
+        lineNumber: 83,
+        columnNumber: 5
+    }, undefined);
+};
+_s2(Timers, "d9wlnephS5SLeHbZQ09IPkRgBV8=", false, function() {
+    return [
+        useApiTimers
+    ];
+});
+_c1 = Timers;
+var _c, _c1;
+$RefreshReg$(_c, "Button");
+$RefreshReg$(_c1, "Timers");
 
-  $parcel$ReactRefreshHelpers$9495.postlude(module);
+  $parcel$ReactRefreshHelpers$ea70.postlude(module);
 } finally {
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-icons/fa6":"b6viq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"b6viq":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-icons/fa6":"b6viq","../api":"fnzcz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"b6viq":[function(require,module,exports) {
 // THIS FILE IS AUTO GENERATED
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
@@ -62163,7 +62329,123 @@ var DefaultContext = {
 };
 var IconContext = (0, _reactDefault.default).createContext && (0, _reactDefault.default).createContext(DefaultContext);
 
-},{"react":"21dqq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"km3Ru":[function(require,module,exports) {
+},{"react":"21dqq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fnzcz":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+const post = async (url)=>{
+    return fetch(url, {
+        method: "POST"
+    });
+};
+const start = ()=>{
+    post("/api/start_timer");
+};
+const stop = ()=>{
+    post("/api/stop_timers");
+};
+const reset = ()=>{
+    post("/api/reset_timer");
+};
+const dispatchEvent = (name, data)=>{
+    window.dispatchEvent(new CustomEvent(name, {
+        detail: data
+    }));
+};
+const connect = ()=>{
+    const startEventSource = ()=>{
+        const source = new EventSource("/api/events");
+        let keepAliveInternal = null;
+        let lastPing = Date.now();
+        source.addEventListener("open", ()=>{
+            Api.isConnected = true;
+            dispatchEvent("connectionChanged", {});
+            keepAliveInternal = setInterval(()=>{
+                const timeSincePing = Date.now() - lastPing;
+                if (timeSincePing > 11000) {
+                    source.close();
+                    // noConnectionMessage.classList.remove("is-hidden")
+                    // setupEvents()
+                    Api.isConnected = false;
+                    dispatchEvent("connectionChanged", {});
+                    clearInterval(keepAliveInternal);
+                    source.close();
+                    setTimeout(startEventSource, 1000);
+                }
+            }, 1000);
+            post("/api/request_sync");
+        });
+        source.addEventListener("error", ()=>{
+            console.log("connection lost");
+            source.close();
+            setTimeout(startEventSource, 1000);
+        });
+        source.addEventListener("syncTimers", (e)=>{
+            const data = JSON.parse(e.data);
+            dispatchEvent("timerUpdate", data.timers);
+        });
+        source.addEventListener("syncSettings", (e)=>{
+            const data = JSON.parse(e.data);
+            console.log(data);
+        });
+        source.addEventListener("ping", (e)=>{
+            lastPing = Date.now();
+        });
+    };
+    startEventSource();
+// const setupEvents = () => {
+//   events = new EventSource("/api/events")
+//   events.addEventListener("open", _ => {
+//     noConnectionMessage.classList.add("is-hidden")
+//     clearInterval(keepAliveInterval)
+//     lastPing = Date.now()
+//     keepAliveInternal = setInterval(_ => {
+//       const timeSincePing = Date.now() - lastPing
+//       if (timeSincePing > 11000) {
+//         events.close()
+//         noConnectionMessage.classList.remove("is-hidden")
+//         setupEvents()
+//       }
+//     }, 1000)
+//   })
+//   events.addEventListener("error", _ => {
+//     noConnectionMessage.classList.remove("is-hidden")
+//   })
+//   events.addEventListener("syncTimers", e => {
+//     const data = JSON.parse(e.data)
+//     const newTimer = data.timer
+//     if (newTimer.startedAt != null) {
+//       newTimer.startedAt = Date.parse(newTimer.startedAt)
+//     }
+//     if (newTimer.stoppedAt != null) {
+//       newTimer.stoppedAt = Date.parse(newTimer.stoppedAt)
+//     }
+//     timer = newTimer
+//     timerClockOffset = Date.parse(data.now) - Date.now()
+//     updateButtons()
+//   })
+//   events.addEventListener("ping", _ => {
+//     lastPing = Date.now()
+//   })
+//   events.addEventListener("syncSettings", e => {
+//     const data = JSON.parse(e.data)
+//     settings = data.settings
+//     updateSettings()
+//   })
+//   fetch("/api/request_sync", {
+//     method: "POST",
+//   })
+// }
+};
+const Api = {
+    connect,
+    start,
+    stop,
+    reset,
+    isConnected: false
+};
+exports.default = Api;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"km3Ru":[function(require,module,exports) {
 "use strict";
 var Refresh = require("7422ead32dcc1e6b");
 function debounce(func, delay) {
@@ -62301,346 +62583,7 @@ function registerExportsForReactRefresh(module1) {
     }
 }
 
-},{"7422ead32dcc1e6b":"786KC"}],"iryIt":[function(require,module,exports) {
-var $parcel$ReactRefreshHelpers$ea70 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-$parcel$ReactRefreshHelpers$ea70.prelude(module);
-
-try {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "formatTime", ()=>formatTime);
-parcelHelpers.export(exports, "Timers", ()=>Timers);
-var _jsxDevRuntime = require("react/jsx-dev-runtime");
-var _react = require("react");
-var _reactDefault = parcelHelpers.interopDefault(_react);
-var _fa6 = require("react-icons/fa6");
-var _api = require("../api");
-var _apiDefault = parcelHelpers.interopDefault(_api);
-var _s = $RefreshSig$(), _s1 = $RefreshSig$(), _s2 = $RefreshSig$();
-const timeElapsed = (timer)=>timer.startedAt == null ? null : Date.now() - timer.startedAt - timer.countdown * 1000;
-const useTimerRef = (timer)=>{
-    _s();
-    console.log("useTimerRef");
-    const timerRef = (0, _react.useRef)();
-    const requestRef = (0, _react.useRef)();
-    const animate = (0, _react.useCallback)(()=>{
-        if (timer == null || timer.startedAt == null) return;
-        timerRef.current.innerHTML = formatTime(timeElapsed(timer));
-        requestRef.current = requestAnimationFrame(animate);
-    }, [
-        timer
-    ]);
-    (0, _react.useEffect)(()=>{
-        if (timer == null || timer.startedAt == null) timerRef.current.innerHTML = formatTime(0);
-        else if (timer.state == "Stopped") timerRef.current.innerHTML = timer.formatted;
-        else {
-            requestRef.current = requestAnimationFrame(animate);
-            return ()=>cancelAnimationFrame(requestRef.current);
-        }
-    }, [
-        timer
-    ]);
-    return timerRef;
-};
-_s(useTimerRef, "qst3dOXPOH8zWdBvNtFkiwrncvE=");
-const useApiTimer = (id)=>{
-    _s1();
-    const [timer, setTimer] = (0, _react.useState)(null);
-    const updateTimer = (0, _react.useCallback)((e)=>{
-        const timer = e.detail;
-        if (timer.id == id) setTimer(timer);
-    }, [
-        id,
-        setTimer
-    ]);
-    (0, _react.useEffect)(()=>{
-        window.addEventListener("timerUpdate", updateTimer);
-        return ()=>window.removeEventListener("timerUpdate", updateTimer);
-    }, [
-        updateTimer
-    ]);
-    return timer;
-};
-_s1(useApiTimer, "ZAfDmOni5XHzVY1rJaJgDuRveSY=");
-const formatTime = (milis)=>{
-    if (milis < 0) {
-        const countdown = Math.ceil(Math.abs(milis) / 1000);
-        return `${countdown}`;
-    }
-    const minutes = Math.floor(milis / 1000 / 60);
-    const seconds = Math.floor(milis % 60000 / 1000);
-    const hundredths = Math.floor(milis % 1000 / 10);
-    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${hundredths.toString().padStart(2, "0")}`;
-};
-const Button = ({ onClick, disabled, children })=>{
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
-        onClick: onClick,
-        disabled: disabled,
-        className: "px-4 py-2 text-sm inline-flex flex-grow justify-center items-center font-medium disabled:cursor-not-allowed text-gray-900 bg-white border border-gray-200 first-child:rounded-l-md last-child:rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:rbng-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 disabled:dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:enabled:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white",
-        children: children
-    }, void 0, false, {
-        fileName: "components/Timers.tsx",
-        lineNumber: 72,
-        columnNumber: 5
-    }, undefined);
-};
-_c = Button;
-const Timers = ()=>{
-    _s2();
-    var _s = $RefreshSig$();
-    const apiTimers = [
-        useApiTimer(0)
-    ];
-    const timerRefs = apiTimers.map(_s((timer)=>{
-        _s();
-        return useTimerRef(timer);
-    }, "9HNiyo0IDuvUjBiuQzNBN1Qv9bc=", false, function() {
-        return [
-            useTimerRef
-        ];
-    }));
-    console.log(apiTimers);
-    const startEnabled = apiTimers[0] && apiTimers[0].state == "Reset";
-    const stopEnabled = apiTimers[0] && apiTimers[0].state != "Reset" && apiTimers[0].state != "Stopped";
-    const resetEnabled = apiTimers[0] && apiTimers[0].state != "Reset";
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-        className: "bg-gray-800 flex flex-col mx-auto items-center max-w-lg rounded-md shadow border border-slate-600",
-        children: [
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                className: "p-5",
-                children: timerRefs.map((ref, i)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
-                        className: "dark:text-gray-300 font-mono p-3 text-5xl [&:not(:first-child)]:border-t [&:not(:first-child)]:border-t-slate-600",
-                        ref: ref
-                    }, i, false, {
-                        fileName: "components/Timers.tsx",
-                        lineNumber: 89,
-                        columnNumber: 36
-                    }, undefined))
-            }, void 0, false, {
-                fileName: "components/Timers.tsx",
-                lineNumber: 88,
-                columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                className: "inline-flex shadow-sm w-full",
-                role: "group",
-                children: [
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(Button, {
-                        onClick: (0, _apiDefault.default).start,
-                        disabled: !startEnabled,
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaPlay), {}, void 0, false, {
-                                fileName: "components/Timers.tsx",
-                                lineNumber: 94,
-                                columnNumber: 11
-                            }, undefined),
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                className: "ml-2",
-                                children: "Start"
-                            }, void 0, false, {
-                                fileName: "components/Timers.tsx",
-                                lineNumber: 95,
-                                columnNumber: 11
-                            }, undefined)
-                        ]
-                    }, void 0, true, {
-                        fileName: "components/Timers.tsx",
-                        lineNumber: 93,
-                        columnNumber: 9
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(Button, {
-                        onClick: (0, _apiDefault.default).stop,
-                        disabled: !stopEnabled,
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaStop), {}, void 0, false, {
-                                fileName: "components/Timers.tsx",
-                                lineNumber: 98,
-                                columnNumber: 11
-                            }, undefined),
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                className: "ml-2",
-                                children: "Stop"
-                            }, void 0, false, {
-                                fileName: "components/Timers.tsx",
-                                lineNumber: 99,
-                                columnNumber: 11
-                            }, undefined)
-                        ]
-                    }, void 0, true, {
-                        fileName: "components/Timers.tsx",
-                        lineNumber: 97,
-                        columnNumber: 9
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(Button, {
-                        onClick: (0, _apiDefault.default).reset,
-                        disabled: !resetEnabled,
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaArrowRotateLeft), {}, void 0, false, {
-                                fileName: "components/Timers.tsx",
-                                lineNumber: 102,
-                                columnNumber: 11
-                            }, undefined),
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                className: "ml-2",
-                                children: "Reset"
-                            }, void 0, false, {
-                                fileName: "components/Timers.tsx",
-                                lineNumber: 103,
-                                columnNumber: 11
-                            }, undefined)
-                        ]
-                    }, void 0, true, {
-                        fileName: "components/Timers.tsx",
-                        lineNumber: 101,
-                        columnNumber: 9
-                    }, undefined)
-                ]
-            }, void 0, true, {
-                fileName: "components/Timers.tsx",
-                lineNumber: 92,
-                columnNumber: 7
-            }, undefined)
-        ]
-    }, void 0, true, {
-        fileName: "components/Timers.tsx",
-        lineNumber: 87,
-        columnNumber: 5
-    }, undefined);
-};
-_s2(Timers, "TQfeddfBBemcAIzINvLRGVy+vx0=", false, function() {
-    return [
-        useApiTimer
-    ];
-});
-_c1 = Timers;
-var _c, _c1;
-$RefreshReg$(_c, "Button");
-$RefreshReg$(_c1, "Timers");
-
-  $parcel$ReactRefreshHelpers$ea70.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-icons/fa6":"b6viq","../api":"fnzcz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"fnzcz":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-const post = async (url)=>{
-    return fetch(url, {
-        method: "POST"
-    });
-};
-const start = ()=>{
-    post("/api/start_timer");
-};
-const stop = ()=>{
-    post("/api/stop_timers");
-};
-const reset = ()=>{
-    post("/api/reset_timer");
-};
-const dispatchEvent = (name, data)=>{
-    window.dispatchEvent(new CustomEvent(name, {
-        detail: data
-    }));
-};
-const connect = ()=>{
-    const startEventSource = ()=>{
-        const source = new EventSource("/api/events");
-        let keepAliveInternal = null;
-        let lastPing = Date.now();
-        source.addEventListener("open", ()=>{
-            Api.isConnected = true;
-            dispatchEvent("connectionChanged", {});
-            keepAliveInternal = setInterval(()=>{
-                const timeSincePing = Date.now() - lastPing;
-                if (timeSincePing > 11000) {
-                    source.close();
-                    // noConnectionMessage.classList.remove("is-hidden")
-                    // setupEvents()
-                    Api.isConnected = false;
-                    dispatchEvent("connectionChanged", {});
-                    clearInterval(keepAliveInternal);
-                    source.close();
-                    setTimeout(startEventSource, 1000);
-                }
-            }, 1000);
-            post("/api/request_sync");
-        });
-        source.addEventListener("error", ()=>{
-            console.log("connection lost");
-            source.close();
-            setTimeout(startEventSource, 1000);
-        });
-        source.addEventListener("syncTimers", (e)=>{
-            const data = JSON.parse(e.data);
-            data.timers.forEach((timer)=>dispatchEvent("timerUpdate", timer));
-        });
-        source.addEventListener("syncSettings", (e)=>{
-            const data = JSON.parse(e.data);
-            console.log(data);
-        });
-        source.addEventListener("ping", (e)=>{
-            lastPing = Date.now();
-        });
-    };
-    startEventSource();
-// const setupEvents = () => {
-//   events = new EventSource("/api/events")
-//   events.addEventListener("open", _ => {
-//     noConnectionMessage.classList.add("is-hidden")
-//     clearInterval(keepAliveInterval)
-//     lastPing = Date.now()
-//     keepAliveInternal = setInterval(_ => {
-//       const timeSincePing = Date.now() - lastPing
-//       if (timeSincePing > 11000) {
-//         events.close()
-//         noConnectionMessage.classList.remove("is-hidden")
-//         setupEvents()
-//       }
-//     }, 1000)
-//   })
-//   events.addEventListener("error", _ => {
-//     noConnectionMessage.classList.remove("is-hidden")
-//   })
-//   events.addEventListener("syncTimers", e => {
-//     const data = JSON.parse(e.data)
-//     const newTimer = data.timer
-//     if (newTimer.startedAt != null) {
-//       newTimer.startedAt = Date.parse(newTimer.startedAt)
-//     }
-//     if (newTimer.stoppedAt != null) {
-//       newTimer.stoppedAt = Date.parse(newTimer.stoppedAt)
-//     }
-//     timer = newTimer
-//     timerClockOffset = Date.parse(data.now) - Date.now()
-//     updateButtons()
-//   })
-//   events.addEventListener("ping", _ => {
-//     lastPing = Date.now()
-//   })
-//   events.addEventListener("syncSettings", e => {
-//     const data = JSON.parse(e.data)
-//     settings = data.settings
-//     updateSettings()
-//   })
-//   fetch("/api/request_sync", {
-//     method: "POST",
-//   })
-// }
-};
-const Api = {
-    connect,
-    start,
-    stop,
-    reset,
-    isConnected: false
-};
-exports.default = Api;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4Zy42":[function(require,module,exports) {
+},{"7422ead32dcc1e6b":"786KC"}],"4Zy42":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$80d8 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -62718,6 +62661,86 @@ $RefreshReg$(_c1, "Notifications");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","../api":"fnzcz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}]},["3fE3b","1xC6H","kjLP2"], "kjLP2", "parcelRequire8d32")
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","../api":"fnzcz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"amg3j":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$a81b = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$a81b.prelude(module);
+
+try {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Settings", ()=>Settings);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
+var _react = require("react");
+var _reactDefault = parcelHelpers.interopDefault(_react);
+const Settings = ()=>{
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+        className: "block p-6 mt-5 max-w-lg mx-auto bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700",
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
+                className: "block mb-2 text-sm font-medium text-gray-900 dark:text-white",
+                for: "user_avatar",
+                children: "Upload background"
+            }, void 0, false, {
+                fileName: "components/Settings.tsx",
+                lineNumber: 6,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                className: "block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400",
+                "aria-describedby": "user_avatar_help",
+                id: "user_avatar",
+                type: "file"
+            }, void 0, false, {
+                fileName: "components/Settings.tsx",
+                lineNumber: 7,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
+                className: "block mb-2 text-sm font-medium text-gray-900 dark:text-white",
+                for: "user_avatar",
+                children: "Countdown"
+            }, void 0, false, {
+                fileName: "components/Settings.tsx",
+                lineNumber: 8,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                type: "number",
+                min: "0",
+                id: "first_name",
+                className: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            }, void 0, false, {
+                fileName: "components/Settings.tsx",
+                lineNumber: 9,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+                type: "button",
+                className: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800",
+                children: "Save"
+            }, void 0, false, {
+                fileName: "components/Settings.tsx",
+                lineNumber: 10,
+                columnNumber: 13
+            }, undefined)
+        ]
+    }, void 0, true, {
+        fileName: "components/Settings.tsx",
+        lineNumber: 5,
+        columnNumber: 9
+    }, undefined);
+};
+_c = Settings;
+var _c;
+$RefreshReg$(_c, "Settings");
+
+  $parcel$ReactRefreshHelpers$a81b.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}]},["3fE3b","1xC6H","kjLP2"], "kjLP2", "parcelRequire8d32")
 
 //# sourceMappingURL=index.6fa4ea68.js.map

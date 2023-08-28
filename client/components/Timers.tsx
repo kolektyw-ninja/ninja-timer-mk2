@@ -4,7 +4,6 @@ import Api, { Timer } from '../api'
 
 const timeElapsed = (timer: Timer): number | null => timer.startedAt == null ? null : Date.now() - timer.startedAt - timer.countdown * 1000
 const useTimerRef = (timer: Timer | null) => {
-  console.log("useTimerRef")
   const timerRef = useRef()
   const requestRef = useRef()
 
@@ -31,22 +30,20 @@ const useTimerRef = (timer: Timer | null) => {
   return timerRef
 }
 
-const useApiTimer = (id: number): Timer | null => {
-  const [timer, setTimer] = useState(null as Timer | null)
+const useApiTimers = (): (Timer | null)[] => {
+  const [timers, setTimers] = useState([null] as (Timer | null)[])
 
-  const updateTimer = useCallback((e: CustomEvent<Timer>) => {
-    const timer = e.detail
-    if (timer.id == id) {
-      setTimer(timer)
-    }
-  }, [id, setTimer])
+  const updateTimers = useCallback((e: CustomEvent<Timer[]>) => {
+    const timers = e.detail
+    setTimers(timers)
+  }, [setTimers])
 
   useEffect(() => {
-    window.addEventListener("timerUpdate", updateTimer)
-    return () => window.removeEventListener("timerUpdate", updateTimer)
-  }, [updateTimer])
+    window.addEventListener("timerUpdate", updateTimers)
+    return () => window.removeEventListener("timerUpdate", updateTimers)
+  }, [updateTimers])
 
-  return timer
+  return timers
 }
 
 export const formatTime = (milis: number): string => {
@@ -76,9 +73,8 @@ const Button: React.FC<ButtonProps> = ({ onClick, disabled, children }) => {
 }
 
 export const Timers = () => {
-  const apiTimers = [useApiTimer(0)]
+  const apiTimers = useApiTimers()
   const timerRefs = apiTimers.map(timer => useTimerRef(timer))
-  console.log(apiTimers)
   const startEnabled = apiTimers[0] && apiTimers[0].state == "Reset"
   const stopEnabled = apiTimers[0] && apiTimers[0].state != "Reset" && apiTimers[0].state != "Stopped"
   const resetEnabled = apiTimers[0] && apiTimers[0].state != "Reset"

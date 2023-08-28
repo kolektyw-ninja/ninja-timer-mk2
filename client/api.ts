@@ -67,8 +67,7 @@ const connect = () => {
 
         source.addEventListener("syncTimers", e => {
             const data = JSON.parse(e.data) as TimersEvent
-
-            data.timers.forEach(timer => dispatchEvent("timerUpdate", timer))
+            dispatchEvent("timerUpdate", data.timers)
         })
 
         source.addEventListener("syncSettings", e => {
