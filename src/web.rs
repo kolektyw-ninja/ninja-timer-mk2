@@ -184,6 +184,7 @@ async fn init_server(sender: mpsc::Sender<InputEvent>, receiver: mpsc::Receiver<
             .app_data(broadcaster.clone())
             .service(start_timer)
             .service(stop_timer)
+            .service(stop_timers)
             .service(reset_timer)
             .service(request_sync)
             .service(events)
