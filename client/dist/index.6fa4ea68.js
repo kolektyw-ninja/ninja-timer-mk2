@@ -27446,7 +27446,6 @@ var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
 var _fa6 = require("react-icons/fa6");
-var _toggle = require("./Toggle");
 const Navbar = ({ darkMode, setDarkMode })=>{
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("nav", {
         className: "w-full p-4 bg-slate-700 mb-4 rounded-b-md font-medium text-gray-400",
@@ -27454,23 +27453,12 @@ const Navbar = ({ darkMode, setDarkMode })=>{
             className: "",
             children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("li", {
                 className: "flex flex-row justify-between items-center",
-                children: [
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaGear), {}, void 0, false, {
-                        fileName: "components/Navbar.tsx",
-                        lineNumber: 10,
-                        columnNumber: 11
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _toggle.Toggle), {
-                        label: "dark mode",
-                        checked: darkMode,
-                        onChange: (e)=>setDarkMode(e.target.checked)
-                    }, void 0, false, {
-                        fileName: "components/Navbar.tsx",
-                        lineNumber: 11,
-                        columnNumber: 11
-                    }, undefined)
-                ]
-            }, void 0, true, {
+                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaGear), {}, void 0, false, {
+                    fileName: "components/Navbar.tsx",
+                    lineNumber: 10,
+                    columnNumber: 11
+                }, undefined)
+            }, void 0, false, {
                 fileName: "components/Navbar.tsx",
                 lineNumber: 9,
                 columnNumber: 9
@@ -27495,7 +27483,7 @@ $RefreshReg$(_c, "Navbar");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-icons/fa6":"b6viq","./Toggle":"1MqVV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"b6viq":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-icons/fa6":"b6viq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"b6viq":[function(require,module,exports) {
 // THIS FILE IS AUTO GENERATED
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
@@ -62175,66 +62163,7 @@ var DefaultContext = {
 };
 var IconContext = (0, _reactDefault.default).createContext && (0, _reactDefault.default).createContext(DefaultContext);
 
-},{"react":"21dqq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1MqVV":[function(require,module,exports) {
-var $parcel$ReactRefreshHelpers$8c94 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-$parcel$ReactRefreshHelpers$8c94.prelude(module);
-
-try {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Toggle", ()=>Toggle);
-var _jsxDevRuntime = require("react/jsx-dev-runtime");
-var _react = require("react");
-var _reactDefault = parcelHelpers.interopDefault(_react);
-const Toggle = ({ label, onChange, checked })=>{
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
-        className: "relative inline-flex items-center cursor-pointer",
-        children: [
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
-                type: "checkbox",
-                value: "",
-                className: "sr-only peer",
-                checked: checked,
-                onChange: onChange
-            }, void 0, false, {
-                fileName: "components/Toggle.tsx",
-                lineNumber: 6,
-                columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                className: "w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-            }, void 0, false, {
-                fileName: "components/Toggle.tsx",
-                lineNumber: 7,
-                columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                className: "ml-3 text-sm font-medium text-gray-900 dark:text-gray-300",
-                children: label
-            }, void 0, false, {
-                fileName: "components/Toggle.tsx",
-                lineNumber: 8,
-                columnNumber: 7
-            }, undefined)
-        ]
-    }, void 0, true, {
-        fileName: "components/Toggle.tsx",
-        lineNumber: 5,
-        columnNumber: 5
-    }, undefined);
-};
-_c = Toggle;
-var _c;
-$RefreshReg$(_c, "Toggle");
-
-  $parcel$ReactRefreshHelpers$8c94.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"km3Ru":[function(require,module,exports) {
+},{"react":"21dqq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"km3Ru":[function(require,module,exports) {
 "use strict";
 var Refresh = require("7422ead32dcc1e6b");
 function debounce(func, delay) {

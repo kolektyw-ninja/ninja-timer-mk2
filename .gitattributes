@@ -1,4 +1,4 @@
 **/Cargo.lock binary
 **/yarn.lock binary
-./client/dist/* binary
+client/dist/* binary
 **/package-lock.json binary

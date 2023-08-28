@@ -8,7 +8,7 @@ export const Navbar = ({ darkMode, setDarkMode }) => {
       <ul className=''>
         <li className='flex flex-row justify-between items-center'>
           <FaGear />
-          <Toggle label="dark mode" checked={darkMode} onChange={e => setDarkMode(e.target.checked)} />
+          {/* <Toggle label="dark mode" checked={darkMode} onChange={e => setDarkMode(e.target.checked)} /> */}
         </li>
       </ul>
     </nav>
