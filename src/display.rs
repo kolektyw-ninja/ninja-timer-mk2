@@ -88,7 +88,7 @@ impl Display {
         
         let mut windows = vec![];
         
-        for i in 0..2 {
+        for i in 0..display_bounds.len() {
             let mut builder = video_subsystem.window(&format!("ninja-timer-{i}"), width, height);
             builder.opengl().resizable();
 
