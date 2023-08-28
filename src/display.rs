@@ -36,6 +36,7 @@ struct WindowData {
     last_millis: i128,
     last_state: TimerState,
     assigned_position: Option<(i16, i16)>,
+    is_fullscreen: bool,
 }
 
 impl Display {
@@ -105,6 +106,7 @@ impl Display {
                 last_millis: 0,
                 last_state: TimerState::Reset,
                 assigned_position: display_bounds.get(i).map(|rect| (rect.x() as i16, rect.y() as i16)),
+                is_fullscreen: false,
             });
         }
 
@@ -295,6 +297,10 @@ impl Display {
         match self.settings {
             None => return,
             Some(settings) => {
+                if (window_data.is_fullscreen == settings.fullscreen) {
+                    return;
+                }
+
                 let fullscreen = sdl_window.fullscreen_state();
 
                 let mut windows = wmctrl::get_windows();
@@ -304,10 +310,10 @@ impl Display {
                     _ => return,
                 };
 
-                if fullscreen == FullscreenType::Off && settings.fullscreen {
+                if !window_data.is_fullscreen && settings.fullscreen {
                     window.transform(wmctrl::Transformation { gravity: 0, x, y, width: 800, height: 600 });
                     window.change_state(wmctrl::State::new(wmctrl::Action::Add, wmctrl::Property::Fullscreen));
-                } else if fullscreen == FullscreenType::True && !settings.fullscreen {
+                } else if window_data.is_fullscreen && !settings.fullscreen {
                     window.change_state(wmctrl::State::new(wmctrl::Action::Remove, wmctrl::Property::Fullscreen));
                 }
             }
