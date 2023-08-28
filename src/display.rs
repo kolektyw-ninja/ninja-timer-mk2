@@ -289,8 +289,8 @@ impl Display {
             Some(settings) => {
                 let fullscreen = window.fullscreen_state();
                 if fullscreen == FullscreenType::Off && settings.fullscreen {
-                    window.set_fullscreen(FullscreenType::True).unwrap();
-                } else if fullscreen == FullscreenType::True && !settings.fullscreen {
+                    window.set_fullscreen(FullscreenType::Desktop).unwrap();
+                } else if fullscreen == FullscreenType::Desktop && !settings.fullscreen {
                     window.set_fullscreen(FullscreenType::Off).unwrap();
                 }
             }
