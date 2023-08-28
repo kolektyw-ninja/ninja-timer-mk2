@@ -286,7 +286,7 @@ impl Display {
     }
 
     fn sync_fullscreen(&self, window_data: &mut WindowData) {
-        if !cfg!(linux) {
+        if !cfg!(target_os = "linux") {
             return;
         }
 
