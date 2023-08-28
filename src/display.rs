@@ -37,6 +37,7 @@ struct WindowData {
     last_state: TimerState,
     assigned_position: Option<(i16, i16)>,
     is_fullscreen: bool,
+    is_visible: bool,
 }
 
 impl Display {
@@ -107,6 +108,7 @@ impl Display {
                 last_state: TimerState::Reset,
                 assigned_position: display_bounds.get(i).map(|rect| (rect.x() as i16, rect.y() as i16)),
                 is_fullscreen: false,
+                is_visible: false,
             });
         }
 
@@ -141,9 +143,13 @@ impl Display {
                 self.sync_fullscreen(window);
 
                 if self.is_visible && window_enabled {
-                    window.canvas.window_mut().show();
-                } else {
+                    if !window.is_visible {
+                        window.canvas.window_mut().show();
+                        window.is_visible = true;
+                    }
+                } else if window.is_visible {
                     window.canvas.window_mut().hide();
+                    window.is_visible = false;
                 }
 
                 // if self.should_toggle_visibility {
