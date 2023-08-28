@@ -177,7 +177,7 @@ impl Display {
                     }
                 }
 
-                if i > self.timers.len() - 1 {
+                if !window_enabled {
                     continue;
                 }
 
