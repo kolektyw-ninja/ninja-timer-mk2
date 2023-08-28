@@ -38,6 +38,7 @@ struct WindowData {
     assigned_position: Option<(i16, i16)>,
     is_fullscreen: bool,
     is_visible: bool,
+    max_size: (u32, u32),
 }
 
 impl Display {
@@ -107,6 +108,7 @@ impl Display {
                 last_millis: 0,
                 last_state: TimerState::Reset,
                 assigned_position: display_bounds.get(i).map(|rect| (rect.x() as i16, rect.y() as i16)),
+                max_size: (display_bounds[i].width(), display_bounds[i].height()),
                 is_fullscreen: false,
                 is_visible: false,
             });
@@ -231,8 +233,14 @@ impl Display {
                         Align::TopLeft,
                     )?;
 
+                    let fps = if frame_duration.as_millis() > 0 {
+                        1000/frame_duration.as_millis() 
+                    } else {
+                        999
+                    };
+
                     render_text(
-                        &format!("FPS: {:.02}", 1000/frame_duration.as_millis()),
+                        &format!("FPS: {:.02}", fps),
                         &Point::new(10, 30),
                         &debug_font.inner,
                         &mut window.canvas,
@@ -294,33 +302,32 @@ impl Display {
     }
 
     fn sync_fullscreen(&self, window_data: &mut WindowData) {
-        if !cfg!(target_os = "linux") {
-            return;
-        }
-
-        let sdl_window = window_data.canvas.window();
+        let sdl_window = window_data.canvas.window_mut();
 
         match self.settings {
             None => return,
             Some(settings) => {
-                if (window_data.is_fullscreen == settings.fullscreen) {
+                if window_data.is_fullscreen == settings.fullscreen {
                     return;
                 }
 
-                let fullscreen = sdl_window.fullscreen_state();
-
-                let mut windows = wmctrl::get_windows();
-                let window = wmctrl::utils::find_window_by_title_mut(&mut windows, sdl_window.title()).unwrap();
+                // let mut windows = wmctrl::get_windows();
+                // let window = wmctrl::utils::find_window_by_title_mut(&mut windows, sdl_window.title()).unwrap();
                 let (x, y) = match window_data.assigned_position {
                     Some(pos) => pos,
                     _ => return,
                 };
 
                 if !window_data.is_fullscreen && settings.fullscreen {
-                    window.transform(wmctrl::Transformation { gravity: 0, x, y, width: 800, height: 600 });
-                    window.change_state(wmctrl::State::new(wmctrl::Action::Add, wmctrl::Property::Fullscreen));
+                    sdl_window.set_bordered(false);
+                    sdl_window.set_position(sdl2::video::WindowPos::Positioned(x.into()), sdl2::video::WindowPos::Positioned(y.into()));
+                    let (width, height) = window_data.max_size;
+                    sdl_window.set_size(width, height);
+                    // window.transform(wmctrl::Transformation { gravity: 0, x, y, width: 800, height: 600 });
+                    // window.change_state(wmctrl::State::new(wmctrl::Action::Add, wmctrl::Property::Fullscreen));
                 } else if window_data.is_fullscreen && !settings.fullscreen {
-                    window.change_state(wmctrl::State::new(wmctrl::Action::Remove, wmctrl::Property::Fullscreen));
+                    sdl_window.set_bordered(true);
+                    // window.change_state(wmctrl::State::new(wmctrl::Action::Remove, wmctrl::Property::Fullscreen));
                 }
             }
         }
