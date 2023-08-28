@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Footer } from './Footer';
 import { Navbar } from './Navbar';
 import { Timers } from './Timers';
 import Notifications from './Notifications';
@@ -15,7 +14,6 @@ export const App = () => {
           <Navbar darkMode={isDark} setDarkMode={setIsDark} />
           <Notifications />
           <Timers />
-          <Footer />
         </div>
       </div>
     </div>
