@@ -38,6 +38,7 @@ pub struct StateManager {
     info: Info,
     reset_at: Instant,
     started_at: Instant,
+    toggled_debug_at: Instant,
     display_visible: bool,
 }
 
@@ -59,6 +60,7 @@ impl StateManager {
             info,
             reset_at: Instant::now(),
             started_at: Instant::now(),
+            toggled_debug_at: Instant::now(),
             display_visible: true,
         }
     }
@@ -122,6 +124,13 @@ impl StateManager {
                     if self.get_timer_mut((button_id - 1).into())?.stop().is_ok() {
                         self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
                     }
+                }
+
+                if button_id == 9 && Instant::now() - self.toggled_debug_at > Duration::from_secs_f32(0.5) {
+                    self.settings.show_debug = !self.settings.show_debug;
+                    self.notify_listeners(&OutputEvent::SyncSettings(self.settings.clone()))?;
+                    self.settings.save().unwrap();
+                    self.toggled_debug_at = Instant::now();
                 }
             },
             InputEvent::SetDebug(debug) => {
