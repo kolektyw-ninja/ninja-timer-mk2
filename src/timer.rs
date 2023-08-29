@@ -94,11 +94,11 @@ impl Timer {
                 format!("{}", seconds_left)
             },
             _ => {
-                let hundredths = (elapsed_millis / 10) % 100;
+                let millis = elapsed_millis % 1000;
                 let seconds = (elapsed_millis / 1000) % 60;
                 let minutes = elapsed_millis / (1000 * 60);
 
-                format!("{:02}:{:02}.{:02}", minutes, seconds, hundredths)
+                format!("{:02}:{:02}.{:03}", minutes, seconds, millis)
             }
         }
     }

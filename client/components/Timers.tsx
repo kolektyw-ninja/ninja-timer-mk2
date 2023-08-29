@@ -53,9 +53,9 @@ export const formatTime = (milis: number): string => {
   }
   const minutes = Math.floor(milis / 1000 / 60)
   const seconds = Math.floor(milis % 60000 / 1000)
-  const hundredths = Math.floor(milis % 1000 / 10)
+  const millis = Math.floor(milis % 1000)
 
-  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${hundredths.toString().padStart(2, "0")}`
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${millis.toString().padStart(3, "0")}`
 }
 
 type ButtonProps = {
