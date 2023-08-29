@@ -62383,7 +62383,15 @@ const connect = ()=>{
         });
         source.addEventListener("syncTimers", (e)=>{
             const data = JSON.parse(e.data);
-            dispatchEvent("timerUpdate", data.timers);
+            const offset = Date.now() - data.now;
+            const timers = data.timers.map((timer)=>{
+                return {
+                    ...timer,
+                    startedAt: timer.startedAt === null ? null : timer.startedAt + offset,
+                    stoppedAt: timer.stoppedAt === null ? null : timer.stoppedAt + offset
+                };
+            });
+            dispatchEvent("timerUpdate", timers);
         });
         source.addEventListener("syncSettings", (e)=>{
             const settings = JSON.parse(e.data).settings;
