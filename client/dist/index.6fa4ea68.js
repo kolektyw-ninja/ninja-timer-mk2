@@ -62384,8 +62384,8 @@ const connect = ()=>{
             dispatchEvent("timerUpdate", data.timers);
         });
         source.addEventListener("syncSettings", (e)=>{
-            const data = JSON.parse(e.data);
-            console.log(data);
+            const settings = JSON.parse(e.data).settings;
+            console.log("syncSettings", settings);
         });
         source.addEventListener("ping", (e)=>{
             lastPing = Date.now();
@@ -62674,7 +62674,21 @@ parcelHelpers.export(exports, "Settings", ()=>Settings);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
+var _s = $RefreshSig$();
 const Settings = ()=>{
+    _s();
+    const backgroundRef = (0, _react.useRef)();
+    const changeBackground = (0, _react.useCallback)((e)=>{
+        if (backgroundRef.current == null) return;
+        const data = new FormData();
+        data.append("background", e.target.files[0]);
+        fetch("/api/upload_background", {
+            method: "POST",
+            body: data
+        });
+    }, [
+        backgroundRef
+    ]);
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         className: "block p-6 mt-5 max-w-lg mx-auto bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700",
         children: [
@@ -62684,17 +62698,19 @@ const Settings = ()=>{
                 children: "Upload background"
             }, void 0, false, {
                 fileName: "components/Settings.tsx",
-                lineNumber: 6,
+                lineNumber: 22,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                ref: backgroundRef,
+                onChange: changeBackground,
                 className: "block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400",
                 "aria-describedby": "user_avatar_help",
                 id: "user_avatar",
                 type: "file"
             }, void 0, false, {
                 fileName: "components/Settings.tsx",
-                lineNumber: 7,
+                lineNumber: 23,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
@@ -62703,7 +62719,7 @@ const Settings = ()=>{
                 children: "Countdown"
             }, void 0, false, {
                 fileName: "components/Settings.tsx",
-                lineNumber: 8,
+                lineNumber: 24,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
@@ -62713,7 +62729,7 @@ const Settings = ()=>{
                 className: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             }, void 0, false, {
                 fileName: "components/Settings.tsx",
-                lineNumber: 9,
+                lineNumber: 25,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
@@ -62722,16 +62738,17 @@ const Settings = ()=>{
                 children: "Save"
             }, void 0, false, {
                 fileName: "components/Settings.tsx",
-                lineNumber: 10,
+                lineNumber: 26,
                 columnNumber: 13
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "components/Settings.tsx",
-        lineNumber: 5,
+        lineNumber: 21,
         columnNumber: 9
     }, undefined);
 };
+_s(Settings, "tgMP6PEjDOyuIXyg95tlHJIg410=");
 _c = Settings;
 var _c;
 $RefreshReg$(_c, "Settings");

@@ -27,6 +27,12 @@ export type Timer = {
     formatted: string,
 }
 
+export type Settings = {
+    countdown: number,
+    fullscreen: boolean,
+    showDebug: boolean,
+}
+
 type TimersEvent = {
     now: number,
     timers: Timer[],
@@ -71,8 +77,8 @@ const connect = () => {
         })
 
         source.addEventListener("syncSettings", e => {
-            const data = JSON.parse(e.data)
-            console.log(data)
+            const settings = JSON.parse(e.data).settings as Settings
+            console.log("syncSettings", settings)
         })
 
         source.addEventListener("ping", e => {

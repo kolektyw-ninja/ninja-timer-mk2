@@ -32,7 +32,6 @@ const TARGET_FRAME_DURATION: Duration = Duration::from_millis(1000 / 30);
 
 struct WindowData {
     canvas: Canvas<Window>,
-    texture_creator: TextureCreator<WindowContext>,
     last_millis: i128,
     last_state: TimerState,
     assigned_position: Option<(i16, i16)>,
@@ -88,6 +87,7 @@ impl Display {
 
         
         let mut windows = vec![];
+        let mut texture_creators = vec![];
         
         for i in 0..display_bounds.len() {
             let mut builder = video_subsystem.window(&format!("ninja-timer-{i}"), width, height);
@@ -104,7 +104,6 @@ impl Display {
 
             windows.push(WindowData{ 
                 canvas, 
-                texture_creator,
                 last_millis: 0,
                 last_state: TimerState::Reset,
                 assigned_position: display_bounds.get(i).map(|rect| (rect.x() as i16, rect.y() as i16)),
@@ -112,6 +111,7 @@ impl Display {
                 is_fullscreen: false,
                 is_visible: false,
             });
+            texture_creators.push(texture_creator);
         }
 
         let bg_path = get_background_path();
@@ -120,6 +120,8 @@ impl Display {
 
         let mut frame_duration: Duration = TARGET_FRAME_DURATION;
         let mut start_sound_played = false;
+
+        let mut backgrounds = vec![None, None];
 
         'running: loop {
             let frame_start = Instant::now();
@@ -138,8 +140,6 @@ impl Display {
 
             self.handle_messages()?;
 
-            let mut backgrounds = vec![None, None];
-
             for (i, window) in windows.iter_mut().enumerate() {
                 let window_enabled = i < self.timers.len();
                 self.sync_fullscreen(window);
@@ -154,22 +154,10 @@ impl Display {
                     window.is_visible = false;
                 }
 
-                // if self.should_toggle_visibility {
-                //     if self.is_shown {
-                //         println!("Hiding display");
-                //         window.canvas.window_mut().hide();
-                //     } else {
-                //         println!("Showing display");
-                //         window.canvas.window_mut().show();
-                //     }
-
-                //     self.is_shown = !self.is_shown;
-                //     self.should_toggle_visibility = false;
-                // }
 
                 if self.should_reload_background {
                     backgrounds[i] = if bg_path.is_file() {
-                        window.texture_creator.load_texture(&bg_path).ok()
+                        texture_creators[i].load_texture(&bg_path).ok()
                     } else {
                         None
                     };
