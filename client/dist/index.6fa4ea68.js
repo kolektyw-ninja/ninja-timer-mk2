@@ -62689,6 +62689,20 @@ const Settings = ()=>{
     }, [
         backgroundRef
     ]);
+    const [countdown, setCountdown] = (0, _react.useState)(0);
+    const saveCallback = (0, _react.useCallback)(()=>{
+        fetch("/api/set_countdown", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                countdown
+            })
+        });
+    }, [
+        countdown
+    ]);
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         className: "block p-6 mt-5 max-w-lg mx-auto bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700",
         children: [
@@ -62698,7 +62712,7 @@ const Settings = ()=>{
                 children: "Upload background"
             }, void 0, false, {
                 fileName: "components/Settings.tsx",
-                lineNumber: 22,
+                lineNumber: 35,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
@@ -62710,7 +62724,7 @@ const Settings = ()=>{
                 type: "file"
             }, void 0, false, {
                 fileName: "components/Settings.tsx",
-                lineNumber: 23,
+                lineNumber: 36,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
@@ -62719,36 +62733,39 @@ const Settings = ()=>{
                 children: "Countdown"
             }, void 0, false, {
                 fileName: "components/Settings.tsx",
-                lineNumber: 24,
+                lineNumber: 37,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                onChange: (e)=>setCountdown(parseInt(e.target.value)),
+                value: countdown,
                 type: "number",
                 min: "0",
                 id: "first_name",
                 className: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             }, void 0, false, {
                 fileName: "components/Settings.tsx",
-                lineNumber: 25,
+                lineNumber: 38,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+                onClick: saveCallback,
                 type: "button",
                 className: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800",
                 children: "Save"
             }, void 0, false, {
                 fileName: "components/Settings.tsx",
-                lineNumber: 26,
+                lineNumber: 39,
                 columnNumber: 13
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "components/Settings.tsx",
-        lineNumber: 21,
+        lineNumber: 34,
         columnNumber: 9
     }, undefined);
 };
-_s(Settings, "tgMP6PEjDOyuIXyg95tlHJIg410=");
+_s(Settings, "dB1xHNXxOMerjgmGJCA/bOphzHE=");
 _c = Settings;
 var _c;
 $RefreshReg$(_c, "Settings");
