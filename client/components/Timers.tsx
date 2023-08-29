@@ -31,10 +31,13 @@ const useTimerRef = (timer: Timer | null) => {
 }
 
 const useApiTimers = (): (Timer | null)[] => {
-  const [timers, setTimers] = useState([null] as (Timer | null)[])
+  const [timers, setTimers] = useState([null, null] as (Timer | null)[])
 
-  const updateTimers = useCallback((e: CustomEvent<Timer[]>) => {
+  const updateTimers = useCallback((e: CustomEvent<(Timer | null)[]>) => {
     const timers = e.detail
+    if (timers.length < 2) {
+      timers.push(null)
+    }
     setTimers(timers)
   }, [setTimers])
 
@@ -83,7 +86,6 @@ export const Timers = () => {
     <div className="bg-gray-800 flex flex-col mx-auto items-center max-w-lg rounded-md shadow border border-slate-600">
       <div className="p-5">
         {timerRefs.map((ref, i) => <p key={i} className="dark:text-gray-300 font-mono p-3 text-5xl [&:not(:first-child)]:border-t [&:not(:first-child)]:border-t-slate-600" ref={ref} />)}
-        {/* <p className="dark:text-gray-300 font-mono border-t border-t-slate-600 p-3 text-5xl" ref={timerRef2}></p> */}
       </div>
       <div className="inline-flex shadow-sm w-full" role="group">
         <Button onClick={Api.start} disabled={!startEnabled}>

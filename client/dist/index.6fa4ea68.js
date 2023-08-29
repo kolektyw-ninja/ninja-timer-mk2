@@ -27475,10 +27475,12 @@ _s(useTimerRef, "qst3dOXPOH8zWdBvNtFkiwrncvE=");
 const useApiTimers = ()=>{
     _s1();
     const [timers, setTimers] = (0, _react.useState)([
+        null,
         null
     ]);
     const updateTimers = (0, _react.useCallback)((e)=>{
         const timers = e.detail;
+        if (timers.length < 2) timers.push(null);
         setTimers(timers);
     }, [
         setTimers
@@ -27491,7 +27493,7 @@ const useApiTimers = ()=>{
     ]);
     return timers;
 };
-_s1(useApiTimers, "fUl7p5QtGRHQr3g4Z1rL+x2nmMc=");
+_s1(useApiTimers, "npQ20bPi5UaqNSVGSXqlX/RFDDk=");
 const formatTime = (milis)=>{
     if (milis < 0) {
         const countdown = Math.ceil(Math.abs(milis) / 1000);
@@ -27510,7 +27512,7 @@ const Button = ({ onClick, disabled, children })=>{
         children: children
     }, void 0, false, {
         fileName: "components/Timers.tsx",
-        lineNumber: 69,
+        lineNumber: 72,
         columnNumber: 5
     }, undefined);
 };
@@ -27540,12 +27542,12 @@ const Timers = ()=>{
                         ref: ref
                     }, i, false, {
                         fileName: "components/Timers.tsx",
-                        lineNumber: 85,
+                        lineNumber: 88,
                         columnNumber: 36
                     }, undefined))
             }, void 0, false, {
                 fileName: "components/Timers.tsx",
-                lineNumber: 84,
+                lineNumber: 87,
                 columnNumber: 7
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -27558,7 +27560,7 @@ const Timers = ()=>{
                         children: [
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaPlay), {}, void 0, false, {
                                 fileName: "components/Timers.tsx",
-                                lineNumber: 90,
+                                lineNumber: 92,
                                 columnNumber: 11
                             }, undefined),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
@@ -27566,13 +27568,13 @@ const Timers = ()=>{
                                 children: "Start"
                             }, void 0, false, {
                                 fileName: "components/Timers.tsx",
-                                lineNumber: 91,
+                                lineNumber: 93,
                                 columnNumber: 11
                             }, undefined)
                         ]
                     }, void 0, true, {
                         fileName: "components/Timers.tsx",
-                        lineNumber: 89,
+                        lineNumber: 91,
                         columnNumber: 9
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(Button, {
@@ -27581,7 +27583,7 @@ const Timers = ()=>{
                         children: [
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaStop), {}, void 0, false, {
                                 fileName: "components/Timers.tsx",
-                                lineNumber: 94,
+                                lineNumber: 96,
                                 columnNumber: 11
                             }, undefined),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
@@ -27589,13 +27591,13 @@ const Timers = ()=>{
                                 children: "Stop"
                             }, void 0, false, {
                                 fileName: "components/Timers.tsx",
-                                lineNumber: 95,
+                                lineNumber: 97,
                                 columnNumber: 11
                             }, undefined)
                         ]
                     }, void 0, true, {
                         fileName: "components/Timers.tsx",
-                        lineNumber: 93,
+                        lineNumber: 95,
                         columnNumber: 9
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(Button, {
@@ -27604,7 +27606,7 @@ const Timers = ()=>{
                         children: [
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _fa6.FaArrowRotateLeft), {}, void 0, false, {
                                 fileName: "components/Timers.tsx",
-                                lineNumber: 98,
+                                lineNumber: 100,
                                 columnNumber: 11
                             }, undefined),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
@@ -27612,25 +27614,25 @@ const Timers = ()=>{
                                 children: "Reset"
                             }, void 0, false, {
                                 fileName: "components/Timers.tsx",
-                                lineNumber: 99,
+                                lineNumber: 101,
                                 columnNumber: 11
                             }, undefined)
                         ]
                     }, void 0, true, {
                         fileName: "components/Timers.tsx",
-                        lineNumber: 97,
+                        lineNumber: 99,
                         columnNumber: 9
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "components/Timers.tsx",
-                lineNumber: 88,
+                lineNumber: 90,
                 columnNumber: 7
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "components/Timers.tsx",
-        lineNumber: 83,
+        lineNumber: 86,
         columnNumber: 5
     }, undefined);
 };
