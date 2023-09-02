@@ -141,7 +141,7 @@ impl Display {
             self.handle_messages()?;
 
             for (i, window) in windows.iter_mut().enumerate() {
-                let window_enabled = i < self.timers.len();
+                let window_enabled = i < self.timers.len() && i < display_bounds.len();
                 self.sync_fullscreen(window);
 
                 if self.is_visible && window_enabled {
@@ -153,7 +153,6 @@ impl Display {
                     window.canvas.window_mut().hide();
                     window.is_visible = false;
                 }
-
 
                 if self.should_reload_background {
                     backgrounds[i] = if bg_path.is_file() {

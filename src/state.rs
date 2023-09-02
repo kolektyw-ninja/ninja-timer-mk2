@@ -55,7 +55,7 @@ impl StateManager {
 
         Self {
             listeners: vec![],
-            timers: (0..info.number_displays).map(|_| Timer::new(settings.countdown)).collect(),
+            timers: (0..2).map(|_| Timer::new(settings.countdown)).collect(),
             settings,
             info,
             reset_at: Instant::now(),
@@ -140,7 +140,7 @@ impl StateManager {
             },
             InputEvent::SetCountdown(countdown) => {
                 self.settings.countdown = countdown;
-                self.timers = (0..self.info.number_displays).map(|_| Timer::new(self.settings.countdown)).collect();
+                self.timers = (0..2).map(|_| Timer::new(self.settings.countdown)).collect();
                 self.notify_listeners(&OutputEvent::SyncSettings(self.settings.clone()))?;
                 self.notify_listeners(&OutputEvent::SyncTimers(self.timers.clone()))?;
 
